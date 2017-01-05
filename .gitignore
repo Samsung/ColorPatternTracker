@@ -1,0 +1,13 @@
+*.class
+PatternTracker/bin/
+PatternTracker/gen/
+PatternTracker/obj/
+PatternTracker/libs/armeabi-v7a/
+PatternTracker/jni/libs/keptLibs/
+PatternTracker/jni/src/archive/
+PatternTracker/gen/com/uob/achohan/hdr/R.java
+PatternTracker/libs/android-support-v4.jar
+GearVRScene/Library
+/.project
+BluetoothLibrary/bin/
+BluetoothLibrary/gen/

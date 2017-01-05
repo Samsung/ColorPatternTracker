@@ -1,0 +1,321 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Patterntracker by SamsungVR</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Patterntracker</h1>
+        <p></p>
+
+        <p class="view"><a href="https://github.com/SamsungVR/PatternTracker">View the Project on GitHub <small>SamsungVR/PatternTracker</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/SamsungVR/PatternTracker/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/SamsungVR/PatternTracker/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/SamsungVR/PatternTracker">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="color-pattern-tracker-user-guide" class="anchor" href="#color-pattern-tracker-user-guide" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Color Pattern Tracker: User Guide</h1>
+
+<p>Virtual reality, or VR, is the newest and potentially the most efficient
+dimension of media. One of the important components of creating a
+virtual experience is simulating the vision. And for simulating vision,
+one should know the user’s field of view at any given time. The field of
+view is in turn determined by the position and orientation of user’s
+head. A few companies have provided some solutions to the head tracking
+problem. Among them <a href="https://www.oculus.com/en-us/dk2/">Oculus</a> is one of the most workable solutions which uses
+infrared LEDs on the headset for tracking. Their system is, however,
+expensive!</p>
+
+<h1>
+<a id="system-overview" class="anchor" href="#system-overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>System overview</h1>
+
+<p>Here, we describe a cost efficient solution to head tracking. It only
+requires a color-printed sheet of paper and a commodity smartphone. In
+the proposed system, a printed pattern is tracked using the smartphone
+camera to estimate its position and orientation. The estimated position
+and orientation are then sent back to the headset via bluetooth. The
+headset in turn renders a virtual scene from a desired viewpoint
+relative to the user’s head. High efficiency and accuracy are two of the
+main characteristics of our system that makes it viable.</p>
+
+<p>The main components of the proposed systems are</p>
+
+<ol>
+<li><p>Pattern design</p></li>
+<li><p>Detector/tracker design</p></li>
+<li><p>Multiple pattern registration</p></li>
+</ol>
+
+<h2>
+<a id="pattern-design" class="anchor" href="#pattern-design" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pattern design</h2>
+
+<p>The six patterns used in our system are shown in the figure
+above. Note that the only difference between the different
+patterns is on their border. Different patterns have different grid
+blocks with black outer border and this difference is what is used to
+identify different patterns. These borders are specifically placed with
+good error tolerance using error correcting codes.</p>
+
+<p>The color grid pattern itself is designed by exhaustively searching for
+all possible combinations of red, green and blue colors on a grid of
+size 4 x 4 for quick and accurate detection.</p>
+
+<table>
+<thead>
+<tr>
+<th><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/pattern_idNewSel5.bmp" alt="Pattern 2" width="140px" height="100px"></th>
+<th><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/pattern_idNewSel6.bmp" alt="Pattern 1" width="140px" height="100px"></th>
+<th><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/pattern_idNewSel9.bmp" alt="Pattern 0" width="140px" height="100px"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pattern 0</td>
+<td>Pattern 1</td>
+<td>Pattern 2</td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/pattern_idNewSel10.bmp" alt="Pattern 2" width="140px" height="100px"></td>
+<td><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/pattern_idNewSel13.bmp" alt="Pattern 1" width="140px" height="100px"></td>
+<td><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/pattern_idNewSel14.bmp" alt="Pattern 0" width="140px" height="100px"></td>
+</tr>
+<tr>
+<td>Pattern 3</td>
+<td>Pattern 4</td>
+<td>Pattern 5</td>
+</tr>
+</tbody>
+</table>
+
+<h2>
+<a id="detectortracker-design" class="anchor" href="#detectortracker-design" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Detector/Tracker design</h2>
+
+<p>The pattern is detected by fast detection of corners in the image which
+contain all the three colors used e.g. red, green and blue. It uses a
+highly optimized coarse to fine algorithm implementation for precise
+detection of corners. Note that all the 9 interior corners of the grid
+pattern have all the three colors surrounding them.</p>
+
+<p>We avoid running (relatively) expensive pattern detection algorithm in
+each frame of video captured by the camera by predicting the position of
+the corners in the next frame and then confining the search for corners
+to a small region. The well known Kalman filter is also used to smoothen
+the pattern trajectory.</p>
+
+<h2>
+<a id="multiple-pattern-registration" class="anchor" href="#multiple-pattern-registration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Multiple pattern registration</h2>
+
+<p>In order to be able to track the user’s head with a single camera,
+multiple patterns are required to be placed on the headset in case one
+of the patterns is highly oblique to the camera. To achieve this,
+relative position and orientation of different patterns is estimated.</p>
+
+<h1>
+<a id="operation" class="anchor" href="#operation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Operation</h1>
+
+<p>In this Section we shall describe the procedure to operate the system
+with varying degree of control on the system. First we shall describe
+the simplest way to run the system using the provided .apk files.</p>
+
+<p>Following are the minimum set of items required to operate the proposed
+system:</p>
+
+<ol>
+<li><p>Tracker phone: Galaxy S6</p></li>
+<li><p>VR headset: GearVR with a smartphone (VR phone)</p></li>
+<li><p>Printed patterns: Cardboard/foamboard cutouts with patterns pasted</p></li>
+</ol>
+
+<p>As more control is required on the system, additional software will be
+required.</p>
+
+<p><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/sideVRH.jpg" alt="VR Headset" width="800px" height="440px"><br>
+VR Headset</p>
+
+<p><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/trackerPhone.jpg" alt="Tracker phone" width="800px" height="440px"><br>
+Tracker phone</p>
+
+<h2>
+<a id="direct-installation" class="anchor" href="#direct-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Direct installation</h2>
+
+<p>Following are the instructions to directly operate the system without
+installation:</p>
+
+<ol>
+<li><p>Install the Tracker apk [PatternTracker.apk] available in the "Executables" folder  on the Tracker phone.</p></li>
+<li><p>Install VR apk [TrackerGearVR.apk] available in the "Executables" folder on a the VR phone.</p></li>
+<li><p>Pair Tracker phone and VR phone via bluetooth.</p></li>
+<li><p>Print the six patterns shown in the figure above as described
+in “Pattern printing instructions" below</p></li>
+<li><p>Attach the Pattern 0 on the front side of VR headset and any number
+of the remaining patterns on other parts of the VR headset. See
+figure above.</p></li>
+<li><p>Start the PatternTracker.apk on Tracker phone. Place this phone
+horizontally so that the “Debug:on" button is on top left corner and
+the back-facing camera facing towards the user. See Figure
+above. Place it appropriately so that the
+GearVR is comfortably in the field of view.</p></li>
+<li><p>Start the app on the VR phone and put it in GearVR.</p></li>
+<li><p>Optionally, register the multiple patterns. See details below.</p></li>
+<li><p>Optionally, click the “Debug:on" button to turn it to “Debug:off"
+which will enhance the performance of the system but will stop
+showing the corner indicator.</p></li>
+<li><p>Wear GearVR and try to move back and forth, and left and right to
+notice that your view in VR is adjusting according to your motion.</p></li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/updateGeomOn.jpg" alt="update geometry on" width="800px" height="440px"><br>
+Tracker phone with “update geometry" feature on.</p>
+
+<p><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/updateGeomOff.jpg" alt="update geometry off" width="800px" height="440px"><br>
+Tracker phone with “update geometry" feature off.</p>
+
+<p>Following are the instructions for registering multiple patterns:</p>
+
+<ol>
+<li><p>Click the “Update Geom: off" button so that it show “Update Geom:
+on"</p></li>
+<li><p>Place the camera of the Tracker phone so that the Pattern 0 and one
+of the other patterns are in view as seen on its screen and capture
+good portion -more than half- of the screen. Make sure the lighting
+is good.</p></li>
+<li><p>See the corner indicators appear on the screen.</p></li>
+<li><p>Once the corner indicators are stable i.e. not coming on and going
+off frequently, press the “Update Geom: on” button again to turn it
+into “Update Geom: off". Notice that below the buttons, each new
+detected pattern will be listed. This shows that the new pattern has
+been registered with the assumption that Pattern 0 was
+already registered. See figure above where
+Pattern 3 is registered with Pattern 0.</p></li>
+<li><p>Follow steps 1 through 4 for registering each new pattern given the
+already registered patterns. E.g. if in the last step Pattern 1 was
+registered, in order to register Pattern 2 place the Tracker phone so
+that either Pattern 0 and Pattern 2 are in view or Pattern 1 and
+Pattern 2 are in view and then follow steps 2 through 3.</p></li>
+</ol>
+
+<p>Pattern printing instructions on windows machine:</p>
+
+<ol>
+<li><p>Open a pattern image among those available at PatternDesign\patterns in windows photo viewer;</p></li>
+<li><p>Print image in letter paper, 3.5x5in, four images in a page,
+un-check “fit to frame”. Size of printed pattern should be 10.6cm
+wide and 7.1cm high. See figure above.</p></li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/SamsungVR/PatternTracker/master/Documents/images/patternSize.jpg" alt="update geometry off" width="800px" height="440px"><br>
+Printed pattern with a measurement scale.</p>
+
+<p>In case the system crashes, one reason is that the opengl libraries on
+phone are incompatible with the ones provided with the system. To
+resolve this issue, the Tracker phone apk will need to be compiled again
+as described in Section below.</p>
+
+<h2>
+<a id="project-compilation" class="anchor" href="#project-compilation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project compilation</h2>
+
+<p>First, we shall describe the compilation of Tracker apk. The compilation
+requires that the following are already installed on the computer:
+latest Android SDK, Android NDK r10b, Eclipse. See <a href="http://developer.android.com/ndk/guides/setup.html">http://developer.android.com/ndk/guides/setup.html</a> for
+reference. Also, OpenCV 2.4.9 for Android, available at <a href="http://opencv.org/downloads.html">http://opencv.org/downloads.html</a>, needs
+to be installed on the system.</p>
+
+<p>To compile the project, first import the project in Eclipse as follows:</p>
+
+<ol>
+<li><p>Browse to File&gt;Import&gt;Android&gt;Existing Android Code
+Into Workspace.</p></li>
+<li><p>Browse to the folder containing PatternTracker project.</p></li>
+<li><p>Select the “PatternTracker" project and click “Finish".</p></li>
+</ol>
+
+<p>Similarly import the OpenCV Librar - 2.4.9 from the downloaded OpenCV
+folder. And also the BluetoothLibrary from the corresponding
+folder.</p>
+
+<p>Now we need to add the required libraries in the project as follows:</p>
+
+<ol>
+<li><p>Select the PatternTracker project in Eclipse on the left panel</p></li>
+<li><p>Go to Project&gt;Properties&gt;Android.</p></li>
+<li><p>In the bottom right “Library" section, remove any existing libraries</p></li>
+<li><p>Click “Add" and add the OpenCV and the Bluetooth libraries.</p></li>
+<li><p>Edit the “include C:/.../OpenCV.mk" line in the Android.mk file
+present inside the jni folder in the PatternTracker android project
+and modify it appropriately to provide the directory where the
+OpenCV is installed.</p></li>
+</ol>
+
+<p>Set the ndk compiler as follows:</p>
+
+<ol>
+<li><p>Select the PatternTracker project in Eclipse on the left panel</p></li>
+<li><p>Go to Project&gt;Properties&gt;Builders.</p></li>
+<li><p>Click “New Builder" on the right panel and click “Edit".</p></li>
+<li><p>In the new window, click on the “Main" tab and enter the location of
+ndk-build.cmd file. It should be something like “...android-ndk-r10b
+folder folder/ndk-build.cmd".</p></li>
+</ol>
+
+<p>Finally, “Clean" and “build" the project and run it on the Galaxy S6
+phone.</p>
+
+<p>If it does not run, libEGL.so and libOpenCL.so will need to be extracted
+from the phone and placed at appropriate location. The libEGL.so file
+typically resides in the /system/lib/ directory of the smartphone and
+libOpenCL.so is typically found in /system/vendor/lib/ directory. The
+following commands on windows command prompt can be used to achieve this
+task:   </p>
+
+<blockquote>
+<p>&gt;adb shell<br>
+&gt;cd storage/sdcard0<br>
+&gt;cp /system/lib/libEGL.so .<br>
+&gt;cp /system/vendor/lib/libOpenCL.so .  </p>
+</blockquote>
+
+<p>Then you can copy the two library files from the windows explorer to “jni\libs". It should now be ready to run.</p>
+
+<p>In order to compile the VR apk, perform the following steps:</p>
+
+<ol>
+<li><p>Install unity 5.3.4f1 available at <a href="https://unity3d.com/get-unity/download">https://unity3d.com/get-unity/download</a>.</p></li>
+<li><p>Open the project and go to File&gt;Build Settings&gt;Player
+Settings&gt;Publishing settings</p></li>
+<li><p>Use some existing keystore or create a new keystore.</p></li>
+<li><p>Click build to create the apk.</p></li>
+</ol>
+
+<p>Once both the VR apk and Tracker apk are built, follow the steps
+described in Direct Installation section to run the system.</p>
+
+<p>A detailed paper providing the complete algorithm description and theoretical underpinnings will be available shortly.</p>
+
+<p>By: Abhishek Nagar<br>
+    Samsung Electronics America, Dallas<br>
+    <a href="mailto:a.nagar@samsung.com">a.nagar@samsung.com</a>   </p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/SamsungVR">SamsungVR</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
