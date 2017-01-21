@@ -73,6 +73,11 @@ multiple patterns are required to be placed on the headset in case one
 of the patterns is highly oblique to the camera. To achieve this,
 relative position and orientation of different patterns is estimated.
 
+Detailed description
+====================
+
+A paper providing the algorithm description and theoretical underpinnings is available [here](https://drive.google.com/file/d/0B9ib55eGTbQCRmptcXNuQW1oSkk/view?usp=sharing). The doxygen documentation generated from this project is available [here](https://cdn.rawgit.com/Samsung/ColorPatternTracker/0a3aa445/doc/PatternTracker/doxygen/html/index.html).
+
 Operation
 =========
 
@@ -261,11 +266,6 @@ In order to compile the VR apk, perform the following steps:
 
 Once both the VR apk and Tracker apk are built, follow the steps
 described in Direct Installation section to run the system.
-
-Detailed description
---------------------
-
-A paper providing the algorithm description and theoretical underpinnings is available [here](https://drive.google.com/file/d/0B9ib55eGTbQCRmptcXNuQW1oSkk/view?usp=sharing). The doxygen documentation generated from this project is available [here](https://cdn.rawgit.com/Samsung/ColorPatternTracker/0a3aa445/doc/PatternTracker/doxygen/html/index.html).
 
 By: Abhishek Nagar   
 	Samsung Electronics America, Dallas   
