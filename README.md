@@ -44,10 +44,10 @@ The color grid pattern itself is designed by exhaustively searching for
 all possible combinations of red, green and blue colors on a grid of
 size 4 x 4 for quick and accurate detection.
 
-| <img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/pattern_idNewSel5.bmp" alt="Pattern 2" width="140px" height="100px">  | <img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/pattern_idNewSel6.bmp" alt="Pattern 1" width="140px" height="100px"> | <img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/pattern_idNewSel9.bmp" alt="Pattern 0" width="140px" height="100px">|
+| <img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/pattern_idNewSel5.bmp" alt="Pattern 2" width="140px" height="100px">  | <img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/pattern_idNewSel6.bmp" alt="Pattern 1" width="140px" height="100px"> | <img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/pattern_idNewSel9.bmp" alt="Pattern 0" width="140px" height="100px">|
 | ------------- | ------------- | -------|
 | Pattern 0  | Pattern 1  | Pattern 2|
-| <img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/pattern_idNewSel10.bmp" alt="Pattern 2" width="140px" height="100px">  | <img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/pattern_idNewSel13.bmp" alt="Pattern 1" width="140px" height="100px"> | <img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/pattern_idNewSel14.bmp" alt="Pattern 0" width="140px" height="100px">|
+| <img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/pattern_idNewSel10.bmp" alt="Pattern 2" width="140px" height="100px">  | <img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/pattern_idNewSel13.bmp" alt="Pattern 1" width="140px" height="100px"> | <img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/pattern_idNewSel14.bmp" alt="Pattern 0" width="140px" height="100px">|
 | Pattern 3  | Pattern 4  | Pattern 5|
 
 Detector/Tracker design
@@ -92,10 +92,10 @@ system:
 As more control is required on the system, additional software will be
 required.
 
-<img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/sideVRH.jpg" alt="VR Headset" width="800px" height="440px">   
+<img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/sideVRH.jpg" alt="VR Headset" width="800px" height="440px">   
 VR Headset
 
-<img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/trackerPhone.jpg" alt="Tracker phone" width="800px" height="440px">   
+<img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/trackerPhone.jpg" alt="Tracker phone" width="800px" height="440px">   
 Tracker phone
 
 Direct installation
@@ -134,10 +134,10 @@ installation:
     notice that your view in VR is adjusting according to your motion.
 
 
-<img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/updateGeomOn.jpg" alt="update geometry on" width="800px" height="440px">   
+<img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/updateGeomOn.jpg" alt="update geometry on" width="800px" height="440px">   
 Tracker phone with “update geometry" feature on.
 
-<img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/updateGeomOff.jpg" alt="update geometry off" width="800px" height="440px">     
+<img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/updateGeomOff.jpg" alt="update geometry off" width="800px" height="440px">     
 Tracker phone with “update geometry" feature off.
 
 Following are the instructions for registering multiple patterns:
@@ -174,7 +174,7 @@ Pattern printing instructions on windows machine:
     un-check “fit to frame”. Size of printed pattern should be 10.6cm
     wide and 7.1cm high. See figure above.
 
-<img src="https://raw.githubusercontent.com/nagarabh/PatternTracker/master/Documents/images/patternSize.jpg" alt="update geometry off" width="800px" height="440px">   
+<img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/patternSize.jpg" alt="update geometry off" width="800px" height="440px">   
 Printed pattern with a measurement scale.
 
 In case the system crashes, one reason is that the opengl libraries on
@@ -262,9 +262,12 @@ In order to compile the VR apk, perform the following steps:
 Once both the VR apk and Tracker apk are built, follow the steps
 described in Direct Installation section to run the system.
 
-A detailed paper providing the complete algorithm description and theoretical underpinnings will be available shortly.
+Detailed description
+--------------------
+
+A paper providing the algorithm description and theoretical underpinnings is available [here](https://drive.google.com/file/d/0B9ib55eGTbQCRmptcXNuQW1oSkk/view?usp=sharing). The doxygen documentation generated from this project is available [here](https://cdn.rawgit.com/Samsung/ColorPatternTracker/0a3aa445/doc/PatternTracker/doxygen/html/index.html).
 
 By: Abhishek Nagar   
 	Samsung Electronics America, Dallas   
 	[a.nagar@samsung.com](mailto:a.nagar@samsung.com)   
-
+	[https://sites.google.com/site/nagarabh/](https://sites.google.com/site/nagarabh/)
