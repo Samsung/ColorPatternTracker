@@ -195,9 +195,13 @@ requires latest android studio with latest Android SDK and NDK, available at htt
 
 To compile the project, 
 1. Open PatternTracker folder in Android Studio using File>Open and then pressing Run> Run 'app'.
+
 2. Edit PatternTracker\app\src\main\cpp\Android.mk file and modify the line “include C:/.../OpenCV.mk" to provide the directory where Android OpenCV is installed.
+
 3. Press Build>Rebuild project.
+
 4. Connect your mobile phone and press Run> Run 'app'
+
 
 If it does not run, libEGL.so and libOpenCL.so will need to be extracted
 from the phone and placed at appropriate location. The libEGL.so file
