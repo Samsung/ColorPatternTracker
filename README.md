@@ -76,7 +76,7 @@ relative position and orientation of different patterns is estimated.
 Detailed description
 ====================
 
-A paper providing the algorithm description and theoretical underpinnings is available [here](https://drive.google.com/file/d/0B9ib55eGTbQCRmptcXNuQW1oSkk/view?usp=sharing). The doxygen documentation generated from this project is available [here](https://cdn.rawgit.com/Samsung/ColorPatternTracker/0a3aa445/doc/PatternTracker/doxygen/html/index.html).
+A paper providing the algorithm description and theoretical underpinnings is available [here](https://drive.google.com/file/d/0B9ib55eGTbQCRmptcXNuQW1oSkk/view?usp=sharing). The doxygen documentation generated from this project is available [here](https://rawgit.com/Samsung/ColorPatternTracker/master/PatternTracker/doxygen/html/index.html).
 
 Operation
 =========
