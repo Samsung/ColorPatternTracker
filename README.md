@@ -194,6 +194,7 @@ First, we shall describe the compilation of Tracker apk. The compilation
 requires latest android studio with latest Android SDK and NDK, available at https://developer.android.com/studio/index.html, and OpenCV 2.4.9 for Android, available at http://opencv.org/downloads.html.
 
 To compile the project, 
+
 1. Open PatternTracker folder in Android Studio using File>Open and then pressing Run> Run 'app'.
 
 2. Edit PatternTracker\app\src\main\cpp\Android.mk file and modify the line “include C:/.../OpenCV.mk" to provide the directory where Android OpenCV is installed.
