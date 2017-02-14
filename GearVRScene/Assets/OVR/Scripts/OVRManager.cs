@@ -468,11 +468,6 @@ public class OVRManager : MonoBehaviour
 	[HideInInspector]
 	internal static bool runInBackground = false;
 
-	[NonSerialized]
-	private static OVRVolumeControl volumeController = null;
-	[NonSerialized]
-	private Transform volumeControllerTransform = null;
-
 #region Unity Messages
 
 	private void Awake()
@@ -512,14 +507,9 @@ public class OVRManager : MonoBehaviour
         }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-		// We want to set up our touchpad messaging system
-		OVRTouchpad.Create();
-
         // Turn off chromatic aberration by default to save texture bandwidth.
         chromatic = false;
 #endif
-
-        InitVolumeController();
 
 		if (display == null)
 			display = new OVRDisplay();
@@ -537,10 +527,6 @@ public class OVRManager : MonoBehaviour
 
 	private void OnEnable()
 	{
-		if (volumeController != null)
-		{
-			volumeController.UpdatePosition(volumeControllerTransform);
-		}
     }
 
 	private void Update()
@@ -726,40 +712,7 @@ public class OVRManager : MonoBehaviour
 
 		display.Update();
 		OVRInput.Update();
-		
-		if (volumeController != null)
-		{
-			if (volumeControllerTransform == null)
-			{
-				if (gameObject.GetComponent<OVRCameraRig>() != null)
-				{
-					volumeControllerTransform = gameObject.GetComponent<OVRCameraRig>().centerEyeAnchor;
-				}
-			}
-			volumeController.UpdatePosition(volumeControllerTransform);
-		}
     }
-
-	/// <summary>
-	/// Creates a popup dialog that shows when volume changes.
-	/// </summary>
-	private static void InitVolumeController()
-	{
-		if (volumeController == null)
-		{
-			Debug.Log("Creating volume controller...");
-			// Create the volume control popup
-			GameObject go = GameObject.Instantiate(Resources.Load("OVRVolumeController")) as GameObject;
-			if (go != null)
-			{
-				volumeController = go.GetComponent<OVRVolumeControl>();
-			}
-			else
-			{
-				Debug.LogError("Unable to instantiate volume controller");
-			}
-		}
-	}
 
 	/// <summary>
 	/// Leaves the application/game and returns to the launcher/dashboard

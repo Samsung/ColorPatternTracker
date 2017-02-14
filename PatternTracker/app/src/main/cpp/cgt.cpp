@@ -17,7 +17,6 @@ JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_init
 JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_processFrame(JNIEnv* jenv, jobject obj, jlong addrLoc, jlong addrMetadataF, jlong addrMetadataI, jint frameNo, jdouble dt, jboolean trackMultiPattern) {
 
 	//double start = omp_get_wtime();
-
 	cv::Mat& mLoc  = *(cv::Mat*)addrLoc;
 	cv::Mat& mMetadataF  = *(cv::Mat*)addrMetadataF; // floating point metadata
 	cv::Mat& mMetadataI  = *(cv::Mat*)addrMetadataI; // integer metadata

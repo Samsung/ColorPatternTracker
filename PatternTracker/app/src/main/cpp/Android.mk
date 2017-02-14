@@ -10,7 +10,7 @@ SRC_PATH := src
 LOCAL_CFLAGS    += -I$(SRC_PATH) -g -Wno-deprecated-declarations
 LOCAL_CFLAGS    += -DSHOW_REFERENCE_PROGRESS=1
 LOCAL_MODULE    := cgt
-LOCAL_SRC_FILES := C:/Research/projects/ColorPatternTracker/PatternTracker/app/src/main/cpp/cgt.cpp \
+LOCAL_SRC_FILES := cgt.cpp \
 	$(SRC_PATH)/util.cpp \
 	$(SRC_PATH)/CLManager.cpp \
 	$(SRC_PATH)/CLTracker.cpp
