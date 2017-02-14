@@ -191,53 +191,13 @@ Project compilation
 -------------------
 
 First, we shall describe the compilation of Tracker apk. The compilation
-requires that the following are already installed on the computer:
-latest Android SDK, Android NDK r10b, Eclipse. See [http://developer.android.com/ndk/guides/setup.html](http://developer.android.com/ndk/guides/setup.html) for
-reference. Also, OpenCV 2.4.9 for Android, available at [http://opencv.org/downloads.html](http://opencv.org/downloads.html), needs
-to be installed on the system.
+requires latest android studio with latest Android SDK and NDK, available at https://developer.android.com/studio/index.html, and OpenCV 2.4.9 for Android, available at http://opencv.org/downloads.html.
 
-To compile the project, first import the project in Eclipse as follows:
-
-1.  Browse to File>Import>Android>Existing Android Code
-    Into Workspace.
-
-2.  Browse to the folder containing PatternTracker project.
-
-3.  Select the “PatternTracker" project and click “Finish".
-
-Similarly import the OpenCV Librar - 2.4.9 from the downloaded OpenCV
-folder. And also the BluetoothLibrary from the corresponding
-folder.
-
-Now we need to add the required libraries in the project as follows:
-
-1.  Select the PatternTracker project in Eclipse on the left panel
-
-2.  Go to Project>Properties>Android.
-
-3.  In the bottom right “Library" section, remove any existing libraries
-
-4.  Click “Add" and add the OpenCV and the Bluetooth libraries.
-
-5.  Edit the “include C:/.../OpenCV.mk" line in the Android.mk file
-    present inside the jni folder in the PatternTracker android project
-    and modify it appropriately to provide the directory where the
-    OpenCV is installed.
-
-Set the ndk compiler as follows:
-
-1.  Select the PatternTracker project in Eclipse on the left panel
-
-2.  Go to Project>Properties>Builders.
-
-3.  Click “New Builder" on the right panel and click “Edit".
-
-4.  In the new window, click on the “Main" tab and enter the location of
-    ndk-build.cmd file. It should be something like “...android-ndk-r10b
-    folder folder/ndk-build.cmd".
-
-Finally, “Clean" and “build" the project and run it on the Galaxy S6
-phone.
+To compile the project, 
+1. Open PatternTracker folder in Android Studio using File>Open and then pressing Run> Run 'app'.
+2. Edit PatternTracker\app\src\main\cpp\Android.mk file and modify the line “include C:/.../OpenCV.mk" to provide the directory where Android OpenCV is installed.
+3. Press Build>Rebuild project.
+4. Connect your mobile phone and press Run> Run 'app'
 
 If it does not run, libEGL.so and libOpenCL.so will need to be extracted
 from the phone and placed at appropriate location. The libEGL.so file
@@ -251,7 +211,7 @@ task:
 >\>cp /system/lib/libEGL.so .  
 >\>cp /system/vendor/lib/libOpenCL.so .  
 
-Then you can copy the two library files from the windows explorer to “jni\libs". It should now be ready to run.
+Then you can copy the two library files from the windows explorer to “PatternTracker\app\src\main\cpp\libs\gs6". It should now be ready to run.
 
 In order to compile the VR apk, perform the following steps:
 
@@ -260,9 +220,14 @@ In order to compile the VR apk, perform the following steps:
 2.  Open the project and go to File>Build Settings>Player
     Settings>Publishing settings
 
-3.  Use some existing keystore or create a new keystore.
+3.  Sign the application with an Oculus Signature File that is specific to your device.  [ See this page for more details on the Oculus Signature File: https://developer3.oculus.com/documentation/mobilesdk/latest/concepts/mobile-submission-sig-file/ ]
 
-4.  Click build to create the apk.
+	3.1 Create an Oculus Signature file following the instructions on this webpage: https://dashboard.oculus.com/tools/osig-generator/
+
+	3.2. Place the Oculus Signature file generated in step 1 in the Unity project in the  \<UnityProject\>/Assets/Plugins/Android/assets/ directory.
+4. Build the Unity project for the Android platform.
+
+5.  Click build to create the apk.
 
 Once both the VR apk and Tracker apk are built, follow the steps
 described in Direct Installation section to run the system.
