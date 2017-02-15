@@ -52,8 +52,6 @@ public class ColorGridTracker {
     /** The tracked origin. */
     private Mat trackedOrigin; /*!< The tracked origin coordinates. */
 
-	private boolean trackedOriginInitialized;
-        
     /** The last capture time. */
     long lastCaptureTime; /*!< The last capture time. */
     
@@ -144,16 +142,15 @@ public class ColorGridTracker {
 		}
 						
 		Mat origin = getLocationOfOrigin();
-		if(!updateOrigin_Kalman(dt, origin))kalamanFilter.initializeKalmanJava(dt);
+		if(!updateOrigin_Kalman(dt, origin)){
+			kalamanFilter.initializeKalmanJava(dt);
+			displayTrackedPatterns();
+			return Mat.zeros(0, 0,CvType.CV_32FC1);
+		}
 		
 		displayTrackedPatterns();
 
-		if(trackedOriginInitialized){
-			return trackedOrigin;
-		}else
-		{
-			return Mat.zeros(0, 0,CvType.CV_32FC1);
-		}
+		return trackedOrigin;
 	}
 	
 	/**
@@ -180,7 +177,6 @@ public class ColorGridTracker {
 				
 		// tracker
         trackedOrigin = Mat.zeros(6, 1, CvType.CV_64FC1);
-		trackedOriginInitialized = false;
 		kalamanFilter = new KalamanFilter();
 		linFilter = new LinearPrediction(mNPatterns);
 		lastCaptureTime=0;
@@ -207,7 +203,6 @@ public class ColorGridTracker {
 		trackedOrigin.put(0, 0, kalamanFilter.kalman_m_n1.get(0,0)[0]);
 		trackedOrigin.put(1, 0, kalamanFilter.kalman_m_n1.get(1,0)[0]);
 		trackedOrigin.put(2, 0, kalamanFilter.kalman_m_n1.get(2,0)[0]);
-		trackedOriginInitialized = true;
 		
 		return true;
 	}
