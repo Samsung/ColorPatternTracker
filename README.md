@@ -78,6 +78,11 @@ Detailed description
 
 A paper providing the algorithm description and theoretical underpinnings is available [here](https://drive.google.com/file/d/0B9ib55eGTbQCRmptcXNuQW1oSkk/view?usp=sharing). The doxygen documentation generated from this project is available [here](https://rawgit.com/Samsung/ColorPatternTracker/master/PatternTracker/doxygen/html/index.html).
 
+TODO
+====
+
+Incorporate evaluation metrics.
+
 Operation
 =========
 
