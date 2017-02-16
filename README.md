@@ -200,9 +200,11 @@ requires latest android studio with latest Android SDK and NDK, available at htt
 
 To compile the project, 
 
-1. Open PatternTracker folder in Android Studio using File>Open and then pressing Run> Run 'app'.
+1. Open PatternTracker folder in Android Studio using File>Open.
 
-2. Edit PatternTracker\app\src\main\cpp\Android.mk file and modify the line “include C:/.../OpenCV.mk" to provide the directory where Android OpenCV is installed.
+2. Copy the file Config\ConfigOpencv_template.mk into a new file Config\ConfigOpencv.mk .
+
+3. Edit Config\ConfigOpencv.mk file and modify the line “include C:/.../OpenCV.mk" to provide the directory where Android OpenCV is installed.
 
 3. Press Build>Rebuild project.
 

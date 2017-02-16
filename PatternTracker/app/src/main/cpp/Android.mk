@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 OPENCV_CAMERA_MODULES:=on
 OPENCV_INSTALL_MODULES:=on
-include $(OPENCV_HOME)/sdk/native/jni/OpenCV.mk
+include $(LOCAL_PATH)/../../../../../Config/ConfigOpencv.mk
 
 SRC_PATH := src
 

@@ -7,3 +7,4 @@ PatternTracker/openCVLibrary249/build
 PatternTracker/app/build
 GearVRScene/Library
 /.project
+Config/ConfigOpencv.mk
