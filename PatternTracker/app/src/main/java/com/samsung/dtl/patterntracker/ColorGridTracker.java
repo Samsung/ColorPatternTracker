@@ -178,6 +178,7 @@ public class ColorGridTracker {
 		// tracker
         trackedOrigin = Mat.zeros(6, 1, CvType.CV_64FC1);
 		kalamanFilter = new KalamanFilter();
+		kalamanFilter.initializeKalmanJava(0);
 		linFilter = new LinearPrediction(mNPatterns);
 		lastCaptureTime=0;
 		
