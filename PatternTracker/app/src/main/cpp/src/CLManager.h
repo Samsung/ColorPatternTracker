@@ -16,6 +16,7 @@
 #include "opencv2/core/core.hpp"
 
 #include <EGL/egl.h> // requires ndk >= r5
+
 #include "util.h"
 
 namespace JNICLTracker{
