@@ -5,7 +5,7 @@ namespace JNICLTracker{
  * This file defines the interface to initialize the opencl, process the input frame and destroy the opencl context
  */
 // initialize //
-JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_initCL(JNIEnv* jenv, jobject obj, jint width, jint height, jint in_tex, jint out_tex) {
+JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_initCL(JNIEnv* jenv, jobject obj, jint width, jint height, jint in_tex, jint out_tex) {
 	clManager = new CLManager();
 	clManager->initCL(cgTracker_kernel);
 
@@ -14,7 +14,7 @@ JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_init
 }
 
 // process //
-JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_processFrame(JNIEnv* jenv, jobject obj, jlong addrLoc, jlong addrMetadataF, jlong addrMetadataI, jint frameNo, jdouble dt, jboolean trackMultiPattern) {
+JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_processFrame(JNIEnv* jenv, jobject obj, jlong addrLoc, jlong addrMetadataF, jlong addrMetadataI, jint frameNo, jdouble dt, jboolean trackMultiPattern) {
 
 	//double start = omp_get_wtime();
 	cv::Mat& mLoc  = *(cv::Mat*)addrLoc;
@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_proc
 }
 
 // destroy //
-JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_destroyCL(JNIEnv* jenv, jobject obj) {
+JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_destroyCL(JNIEnv* jenv, jobject obj) {
 	tracker->cleanupOpenCL();
 }
 

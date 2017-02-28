@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.samsung.dtl.patterntracker"
+    package="com.samsung.dtl.colorpatterntracker"
     android:installLocation="preferExternal"
     android:versionCode="1"
     android:versionName="1.0">
@@ -21,8 +21,8 @@
     <uses-permission android:name="com.sonyericsson.permission.CAMERA_EXTENDED" />
     <uses-permission android:name="com.sonyericsson.permission.CAMERA" />
     <uses-permission android:name="com.sonymobile.permission.SYSTEM_UI_VISIBILITY_EXTENSIONS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!--uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /-->
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
@@ -36,7 +36,7 @@
         android:icon="@drawable/ic_launcher"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         <activity
-            android:name="MainTrackerActivity"
+            android:name="com.samsung.dtl.colorpatterntracker.MainTrackerActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
             >

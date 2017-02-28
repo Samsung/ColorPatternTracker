@@ -16,9 +16,9 @@ CLManager* clManager;
 CLTracker* tracker;
 
 extern "C" {
-	JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_initCL(JNIEnv* jenv, jobject obj, jint width, jint height, jint in_tex, jint out_tex);
-	JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_processFrame(JNIEnv* jenv, jobject obj, jlong addrLoc, jlong addrMetadataF, jlong addrMetadataI, jint frameNo, jdouble dt, jboolean trackMultiPattern);
-	JNIEXPORT void JNICALL Java_com_samsung_dtl_patterntracker_ColorGridTracker_destroyCL(JNIEnv* jenv, jobject obj);
+	JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_initCL(JNIEnv* jenv, jobject obj, jint width, jint height, jint in_tex, jint out_tex);
+	JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_processFrame(JNIEnv* jenv, jobject obj, jlong addrLoc, jlong addrMetadataF, jlong addrMetadataI, jint frameNo, jdouble dt, jboolean trackMultiPattern);
+	JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_destroyCL(JNIEnv* jenv, jobject obj);
 };
 }
 
