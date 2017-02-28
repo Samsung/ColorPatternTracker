@@ -6,29 +6,77 @@
 #include <stdexcept>
 
 #include "CLManager.h"
+
 namespace JNICLTracker{
 CLManager::CLManager() {
+	loadOCLLibrary();
 	m_clContext = 0;
 	m_queue = 0;
 	m_program = 0;
 }
 
 CLManager::~CLManager() {
+	unloadOCLLibrary();
 }
 
+
+
+
+void	CLManager::unloadOCLLibrary(){
+		dlclose(oclLibraryHandle);
+		dlclose(eglLibraryHandle);
+	}
+
+void	CLManager::loadOCLLibrary(){
+		eglLibraryHandle = dlopen("/system/lib/libEGL.so", RTLD_GLOBAL | RTLD_NOW);
+		oclLibraryHandle = dlopen("/system/vendor/lib/libOpenCL.so", RTLD_GLOBAL | RTLD_NOW);
+
+
+		*(void **)(&myClGetPlatformIDs) = dlsym(oclLibraryHandle, "clGetPlatformIDs");
+		*(void **)(&myClGetDeviceIDs) = dlsym(oclLibraryHandle, "clGetDeviceIDs");
+		*(void **)(&myClGetDeviceInfo) = dlsym(oclLibraryHandle, "clGetDeviceInfo");
+		*(void **)(&myClCreateContext) = dlsym(oclLibraryHandle, "clCreateContext");
+		*(void **)(&myClReleaseContext) = dlsym(oclLibraryHandle, "clReleaseContext");
+		*(void **)(&myClReleaseCommandQueue) = dlsym(oclLibraryHandle, "clReleaseCommandQueue");
+		*(void **)(&myClCreateBuffer) = dlsym(oclLibraryHandle, "clCreateBuffer");
+		*(void **)(&myClReleaseMemObject) = dlsym(oclLibraryHandle, "clReleaseMemObject");
+		*(void **)(&myClCreateProgramWithSource) = dlsym(oclLibraryHandle, "clCreateProgramWithSource");
+		*(void **)(&myClReleaseProgram) = dlsym(oclLibraryHandle, "clReleaseProgram");
+		*(void **)(&myClBuildProgram) = dlsym(oclLibraryHandle, "clBuildProgram");
+		*(void **)(&myClGetProgramBuildInfo) = dlsym(oclLibraryHandle, "clGetProgramBuildInfo");
+		*(void **)(&myClCreateKernel) = dlsym(oclLibraryHandle, "clCreateKernel");
+		*(void **)(&myClReleaseKernel) = dlsym(oclLibraryHandle, "clReleaseKernel");
+		*(void **)(&myClSetKernelArg) = dlsym(oclLibraryHandle, "clSetKernelArg");
+		*(void **)(&myClGetEventProfilingInfo) = dlsym(oclLibraryHandle, "clGetEventProfilingInfo");
+		*(void **)(&myClFinish) = dlsym(oclLibraryHandle, "clFinish");
+		*(void **)(&myClEnqueueReadBuffer) = dlsym(oclLibraryHandle, "clEnqueueReadBuffer");
+		*(void **)(&myClEnqueueWriteBuffer) = dlsym(oclLibraryHandle, "clEnqueueWriteBuffer");
+		*(void **)(&myClEnqueueNDRangeKernel) = dlsym(oclLibraryHandle, "clEnqueueNDRangeKernel");
+		*(void **)(&myClCreateCommandQueue) = dlsym(oclLibraryHandle, "clCreateCommandQueue");
+		*(void **)(&myClEnqueueTask) = dlsym(oclLibraryHandle, "clEnqueueTask");
+		*(void **)(&myClEnqueueAcquireGLObjects) = dlsym(oclLibraryHandle, "clEnqueueAcquireGLObjects");
+		*(void **)(&myClEnqueueReleaseGLObjects) = dlsym(oclLibraryHandle, "clEnqueueReleaseGLObjects");
+		*(void **)(&myClCreateFromGLTexture2D) = dlsym(oclLibraryHandle, "clCreateFromGLTexture2D");
+
+		*(void **)(&myEglGetCurrentDisplay) = dlsym(eglLibraryHandle, "eglGetCurrentDisplay");
+		*(void **)(&myEglGetError) = dlsym(eglLibraryHandle, "eglGetError");
+		*(void **)(&myEglGetCurrentContext) = dlsym(eglLibraryHandle, "eglGetCurrentContext");
+	}
+
 bool CLManager::initCL(const char *source) {
+
 	EGLDisplay mEglDisplay;
 	EGLContext mEglContext;
 
-	if ((mEglDisplay = eglGetCurrentDisplay()) == EGL_NO_DISPLAY) {
-		JNICLTracker::print_out("eglGetCurrentDisplay() returned error %d", eglGetError());
+	if ((mEglDisplay = myEglGetCurrentDisplay()) == EGL_NO_DISPLAY) {
+		JNICLTracker::print_out("eglGetCurrentDisplay() returned error %d", myEglGetError());
 	}
-	JNICLTracker::print_out("eglGetCurrentDisplay() returned error %d success is %d", eglGetError(),EGL_SUCCESS);
+	JNICLTracker::print_out("eglGetCurrentDisplay() returned error %d success is %d", myEglGetError(),EGL_SUCCESS);
 
-	if ((mEglContext = eglGetCurrentContext()) == EGL_NO_CONTEXT) {
-		print_out("eglGetCurrentContext() returned error %d", eglGetError());
+	if ((mEglContext = myEglGetCurrentContext()) == EGL_NO_CONTEXT) {
+		print_out("eglGetCurrentContext() returned error %d", myEglGetError());
 	}
-	print_out("eglGetCurrentContext() returned error %d success is %d", eglGetError(), EGL_SUCCESS);
+	print_out("eglGetCurrentContext() returned error %d success is %d", myEglGetError(), EGL_SUCCESS);
 
 	cl_context_properties context_prop[7];
 	context_prop[0] = CL_GL_CONTEXT_KHR;
@@ -49,7 +97,7 @@ bool CLManager::initCL(const char *source) {
 	cl_uint numPlatforms, numDevices;
 
 	cl_platform_id platform, platforms[params.platformIndex+1];
-	err = clGetPlatformIDs(params.platformIndex+1, platforms, &numPlatforms);
+	err = myClGetPlatformIDs(params.platformIndex+1, platforms, &numPlatforms);
 	CHECK_ERROR_OCL(err, "getting platforms", releaseCL, return false);
 	print_out("Platform index %d (%d platforms found)", params.platformIndex, numPlatforms);
 	if (params.platformIndex >= numPlatforms) {
@@ -60,7 +108,7 @@ bool CLManager::initCL(const char *source) {
 	platform = platforms[params.platformIndex];
 
 	cl_device_id devices[params.deviceIndex+1];
-	err = clGetDeviceIDs(platform, params.type, params.deviceIndex+1, devices, &numDevices);
+	err = myClGetDeviceIDs(platform, params.type, params.deviceIndex+1, devices, &numDevices);
 	CHECK_ERROR_OCL(err, "getting devices", releaseCL, return false);
 	print_out("Device index %d out of range (%d devices found)",params.deviceIndex, numDevices);
 	if (params.deviceIndex >= numDevices) {
@@ -71,41 +119,69 @@ bool CLManager::initCL(const char *source) {
 	m_device = devices[params.deviceIndex];
 
 	char name[64];
-	err = clGetDeviceInfo(m_device, CL_DEVICE_NAME, 64, name, NULL);
+	err = myClGetDeviceInfo(m_device, CL_DEVICE_NAME, 64, name, NULL);
 	CHECK_ERROR_OCL(err, "getting device info device name", releaseCL, return false);
 	print_out("Using device: %s", name);
 
+	char clVersionName[1024];
+	err = myClGetDeviceInfo(m_device, CL_DEVICE_VERSION, 1024, clVersionName, NULL);
+	CHECK_ERROR_OCL(err, "getting device info device version", releaseCL, return false);
+	print_out("Using opencl version : %s", clVersionName);
+
+	err = myClGetDeviceInfo(m_device, CL_DEVICE_PROFILE, 1024, clVersionName, NULL);
+	CHECK_ERROR_OCL(err, "getting device info device version profile", releaseCL, return false);
+	print_out("Using opencl version profile: %s", clVersionName);
+
+	err = myClGetDeviceInfo(m_device, CL_DEVICE_EXTENSIONS, 1024, clVersionName, NULL);
+	CHECK_ERROR_OCL(err, "getting device info device extensions", releaseCL, return false);
+	print_out("Using opencl version profile: %s", clVersionName);
+
 	cl_ulong device_size;
-	err = clGetDeviceInfo(m_device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(device_size), &device_size, NULL);
+	err = myClGetDeviceInfo(m_device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(device_size), &device_size, NULL);
 	CHECK_ERROR_OCL(err, "global mem", releaseCL, return false);
 	print_out("CL_DEVICE_GLOBAL_MEM_SIZE: %lu bytes", device_size);
 
-	err = clGetDeviceInfo(m_device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(device_size), &device_size, NULL);
+	err = myClGetDeviceInfo(m_device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(device_size), &device_size, NULL);
 	CHECK_ERROR_OCL(err, "local mem", releaseCL, return false);
 	print_out("CL_DEVICE_LOCAL_MEM_SIZE: %lu bytes", device_size);
 
-	err = clGetDeviceInfo(m_device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(size_t), &max_cu, NULL);
+	err = myClGetDeviceInfo(m_device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(size_t), &max_cu, NULL);
 	CHECK_ERROR_OCL(err, "compute units", releaseCL, return false);
 	print_out("CL_DEVICE_MAX_COMPUTE_UNITS: %lu", max_cu);
 
 	if (params.opengl) context_prop[5] = (cl_context_properties) platform;
 
-	m_clContext = clCreateContext(context_prop, 1, &m_device, NULL, NULL, &err);
+	m_clContext = myClCreateContext(context_prop, 1, &m_device, NULL, NULL, &err);
+	if(err == CL_INVALID_PLATFORM){
+		print_out("CL_INVALID_PLATFORM");
+	}
+	if(err == CL_INVALID_VALUE){
+		print_out("CL_INVALID_VALUE");
+	}
+	if(err == CL_INVALID_DEVICE){
+		print_out("CL_INVALID_DEVICE");
+	}
+	if(err == CL_DEVICE_NOT_AVAILABLE){
+		print_out("CL_DEVICE_NOT_AVAILABLE");
+	}
+	if(err == CL_OUT_OF_HOST_MEMORY){
+		print_out("CL_OUT_OF_HOST_MEMORY");
+	}
 	CHECK_ERROR_OCL(err, "creating context", releaseCL, return false);
 
-	m_queue = clCreateCommandQueue(m_clContext, m_device, CL_QUEUE_PROFILING_ENABLE, &err);
+	m_queue = myClCreateCommandQueue(m_clContext, m_device, CL_QUEUE_PROFILING_ENABLE, &err);
 	CHECK_ERROR_OCL(err, "creating command queue", releaseCL, return false);
 
-	m_program = clCreateProgramWithSource(m_clContext, 1, &source, NULL, &err);
+	m_program = myClCreateProgramWithSource(m_clContext, 1, &source, NULL, &err);
 	CHECK_ERROR_OCL(err, "creating program", releaseCL, return false);
 
-	err = clBuildProgram(m_program, 1, &m_device, options, NULL, NULL);
+	err = myClBuildProgram(m_program, 1, &m_device, options, NULL, NULL);
 	if (err == CL_BUILD_PROGRAM_FAILURE) {
 		size_t sz;
-		clGetProgramBuildInfo(
+		myClGetProgramBuildInfo(
 			m_program, m_device, CL_PROGRAM_BUILD_LOG, 0, NULL, &sz);
 		char *log = (char*)malloc(++sz);
-		clGetProgramBuildInfo(
+		myClGetProgramBuildInfo(
 			m_program, m_device, CL_PROGRAM_BUILD_LOG, sz, log, NULL);
 		print_out(log);
 		free(log);
@@ -118,15 +194,15 @@ bool CLManager::initCL(const char *source) {
 
 void CLManager::releaseCL() {
 	if (m_program) {
-		clReleaseProgram(m_program);
+		myClReleaseProgram(m_program);
 		m_program = 0;
 	}
 	if (m_queue) {
-		clReleaseCommandQueue(m_queue);
+		myClReleaseCommandQueue(m_queue);
 		m_queue = 0;
 	}
 	if (m_clContext) {
-		clReleaseContext(m_clContext);
+		myClReleaseContext(m_clContext);
 		m_clContext = 0;
 	}
 }

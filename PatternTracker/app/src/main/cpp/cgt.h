@@ -4,16 +4,21 @@
 #include <android/native_window.h> // requires ndk >= r5
 #include <android/native_window_jni.h> // requires ndk >= r5
 
-#include "src/opencl/cgTracker.h"
+#include <CL/cl.h>
+#include <CL/cl_gl.h>
+#include<dlfcn.h>
 
+#include "src/opencl/cgTracker.h"
 #include "src/CLManager.h"
 #include "src/CLTracker.h"
 #include "util.h"
 
+
+
 namespace JNICLTracker{
 
-CLManager* clManager;
-CLTracker* tracker;
+	CLManager* clManager;
+	CLTracker* tracker;
 
 extern "C" {
 	JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_initCL(JNIEnv* jenv, jobject obj, jint width, jint height, jint in_tex, jint out_tex);

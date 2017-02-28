@@ -13,9 +13,9 @@ LOCAL_MODULE    := cgt
 LOCAL_SRC_FILES := cgt.cpp \
 	$(SRC_PATH)/util.cpp \
 	$(SRC_PATH)/CLManager.cpp \
-	$(SRC_PATH)/CLTracker.cpp
+    $(SRC_PATH)/CLTracker.cpp
 
-LOCAL_LDLIBS := -landroid -llog -ljnigraphics $(LOCAL_PATH)/../../../../../Config/libs/gs6/libOpenCL.so $(LOCAL_PATH)/../../../../../Config/libs/gs6/libEGL.so
+LOCAL_LDLIBS := -landroid -llog -ljnigraphics -ldl
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
 
 include $(BUILD_SHARED_LIBRARY)
