@@ -8,3 +8,11 @@ PatternTracker/app/build
 GearVRScene/Library
 /.project
 Config/ConfigOpencv.mk
+PatternTracker/app/src/main/cpp/CL_bkup
+PatternTracker/libraries/opencv/build
+PatternTracker/libraries/opencv/javadoc
+PatternTracker/app/src/main/cpp - Copy
+PatternTracker/app/app-release.apk
+PatternTracker/app/src/main/cpp/src/CLStubTemp.h
+PatternTracker/app/src/main/cpp/src/CLStub_mod.cpp
+PatternTracker/app/src/main/cpp/src/CLStub_mod.h

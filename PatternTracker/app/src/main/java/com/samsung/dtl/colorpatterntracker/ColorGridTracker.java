@@ -74,7 +74,7 @@ public class ColorGridTracker {
 	static {
 		//System.load("/vendor/lib/egl/libGLESv1_CM_adreno.so");
 		//System.load("/vendor/lib/egl/libGLESv2_adreno.so");
-		//System.load("/vendor/lib/egl/libGLES_mali.so");
+		System.load("/vendor/lib/egl/libGLES_mali.so");
 		System.loadLibrary("cgt");
 	}
 
