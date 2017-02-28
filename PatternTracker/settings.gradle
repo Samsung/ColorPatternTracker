@@ -1,2 +1,2 @@
 include ':app', ':BluetoothLibrary'
-include ':libraries:opencv'
+include ':openCVLibrary249'

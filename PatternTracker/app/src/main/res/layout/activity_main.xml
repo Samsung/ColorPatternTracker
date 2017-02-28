@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1">
-    <com.samsung.dtl.colorpatterntracker.CustomGLSurfaceView
+    <com.samsung.dtl.patterntracker.CustomGLSurfaceView
         android:id="@+id/surfaceviewclass"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
