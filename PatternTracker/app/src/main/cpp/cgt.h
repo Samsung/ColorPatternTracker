@@ -20,6 +20,8 @@ namespace JNICLTracker{
 	CLManager* clManager;
 	CLTracker* tracker;
 
+	void getLibNames(char *oclLibName, char *eglLibName);
+
 extern "C" {
 	JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_initCL(JNIEnv* jenv, jobject obj, jint width, jint height, jint in_tex, jint out_tex);
 	JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_processFrame(JNIEnv* jenv, jobject obj, jlong addrLoc, jlong addrMetadataF, jlong addrMetadataI, jint frameNo, jdouble dt, jboolean trackMultiPattern);

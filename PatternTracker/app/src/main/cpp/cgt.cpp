@@ -9,10 +9,14 @@ namespace JNICLTracker{
  */
 // initialize //
 JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_initCL(JNIEnv* jenv, jobject obj, jint width, jint height, jint in_tex, jint out_tex) {
-    clManager = new CLManager();
+    char oclLibName[1024];
+    char eglLibName[1024];
+    getLibNames(oclLibName, eglLibName);
+
+    clManager = new CLManager(oclLibName, eglLibName);
     clManager->initCL(cgTracker_kernel);
 
-    tracker = new CLTracker(clManager);
+    tracker = new CLTracker(clManager, oclLibName);
     tracker->setupOpenCL(width, height, in_tex, out_tex);
 }
 
@@ -32,6 +36,56 @@ JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker
 // destroy //
 JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker_destroyCL(JNIEnv* jenv, jobject obj) {
     tracker->cleanupOpenCL();
+}
+
+void getLibNames(char *oclLibName, char *eglLibName){
+    strcpy(oclLibName,"/system/vendor/lib/egl/libGLES_mali.so");
+    strcpy(eglLibName,"/system/vendor/lib/egl/libGLES_mali.so");
+
+    // ARM Mali
+    if (FILE *file = fopen("/system/vendor/lib/egl/libGLES_mali.so", "r")) {
+        fclose(file);
+        strcpy(oclLibName,"/system/vendor/lib/egl/libGLES_mali.so");
+        strcpy(eglLibName,"/system/vendor/lib/egl/libGLES_mali.so");
+        return;
+    }
+
+    if (FILE *file = fopen("/system/lib/egl/libGLES_mali.so", "r")) {
+        fclose(file);
+        strcpy(oclLibName,"/system/lib/egl/libGLES_mali.so");
+        strcpy(eglLibName,"/system/lib/egl/libGLES_mali.so");
+        return;
+    }
+
+    // PowerVR
+    if (FILE *file = fopen("/system/vendor/lib/libPVROCL.so", "r")) {
+        fclose(file);
+        strcpy(oclLibName,"/system/vendor/lib/libPVROCL.so");
+        strcpy(eglLibName,"/system/lib/libEGL.so");
+        return;
+    }
+
+    //Qualcomm Adreno
+    if (FILE *file = fopen("/system/vendor/lib/libOpenCL.so", "r")) { //
+        fclose(file);
+        strcpy(oclLibName,"/system/vendor/lib/libOpenCL.so");
+        strcpy(eglLibName,"/system/lib/libEGL.so");
+        return;
+    }
+    if (FILE *file = fopen("/system/lib/egl/libGLES_mali.so", "r")) { //
+        fclose(file);
+        strcpy(oclLibName,"/system/lib/egl/libGLES_mali.so");
+        strcpy(eglLibName,"/system/lib/libEGL.so");
+        return;
+    }
+
+    if (FILE *file = fopen("/vendor/lib/egl/libGLESv2_adreno.so", "r")) {
+        fclose(file);
+        strcpy(oclLibName,"/vendor/lib/egl/libGLESv2_adreno.so");
+        strcpy(eglLibName,"/system/lib/libEGL.so");
+        return;
+    }
+
 }
 
 }

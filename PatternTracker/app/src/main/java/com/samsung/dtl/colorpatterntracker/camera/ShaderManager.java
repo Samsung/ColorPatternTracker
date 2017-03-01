@@ -1,10 +1,13 @@
 package com.samsung.dtl.colorpatterntracker.camera;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import android.content.Context;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
@@ -56,6 +59,8 @@ public class ShaderManager {
 			"void main() {\n" +
 			"  gl_FragColor = texture2D(sTexture, texCoord);\n" +
 			"}";
+
+	public Context context;
 	
 	/**
 	 * Initialize texture coordinates.
@@ -104,7 +109,6 @@ public class ShaderManager {
 		  Log.d("", "unable to bind fbo" + fbret);
 		}
 		GLES20.glViewport(0, 0, camera_res.x, camera_res.y);
-		
 		synchronized(this) {
 			mSTexture.updateTexImage();
 			captureTime=mSTexture.getTimestamp();
@@ -128,6 +132,26 @@ public class ShaderManager {
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 		GLES20.glFinish();
 
+		/*
+		ByteBuffer byteBuffer = ByteBuffer.allocate(1920*1080 * 4);
+		IntBuffer ib = byteBuffer.asIntBuffer();
+
+		GLES20.glReadPixels(0, 0, 1080, 1920, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, ib);
+		byte[] array = byteBuffer.array();
+
+		String filename = "/storage/sdcard0/imgcjava.bin";
+		java.io.FileOutputStream outputStream = null;
+
+		try {
+			outputStream =  context.openFileOutput(filename, Context.MODE_PRIVATE);
+			outputStream.write(array);
+			outputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		*/
 		return captureTime;
 	}
 	

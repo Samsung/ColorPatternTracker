@@ -8,7 +8,8 @@
 
 
 namespace JNICLTracker{
-CLTracker::CLTracker(CLManager *_clManager) {
+CLTracker::CLTracker(CLManager *_clManager, char *_oclLibName) {
+	strcpy(oclLibraryName,_oclLibName);
 	loadOCLLibrary();
 	clManager = _clManager;
 	m_sz_blk = 5;
@@ -23,7 +24,7 @@ CLTracker::~CLTracker() {
 	}
 
 	void	CLTracker::loadOCLLibrary(){
-		oclLibraryHandle = dlopen("/system/vendor/lib/libOpenCL.so", RTLD_GLOBAL | RTLD_NOW);
+		oclLibraryHandle = dlopen(oclLibraryName, RTLD_GLOBAL | RTLD_NOW);
 
 		*(void **)(&myClGetPlatformIDs) = dlsym(oclLibraryHandle, "clGetPlatformIDs");
 		*(void **)(&myClGetDeviceIDs) = dlsym(oclLibraryHandle, "clGetDeviceIDs");
@@ -32,16 +33,16 @@ CLTracker::~CLTracker() {
 		*(void **)(&myClReleaseContext) = dlsym(oclLibraryHandle, "clReleaseContext");
 		*(void **)(&myClReleaseCommandQueue) = dlsym(oclLibraryHandle, "clReleaseCommandQueue");
 		*(void **)(&myClCreateBuffer) = dlsym(oclLibraryHandle, "clCreateBuffer");
-		*(void **)(&myClReleaseMemObject) = dlsym(oclLibraryHandle, "myClReleaseMemObject");
+		*(void **)(&myClReleaseMemObject) = dlsym(oclLibraryHandle, "clReleaseMemObject");
 		*(void **)(&myClCreateProgramWithSource) = dlsym(oclLibraryHandle, "clCreateProgramWithSource");
 		*(void **)(&myClReleaseProgram) = dlsym(oclLibraryHandle, "clReleaseProgram");
 		*(void **)(&myClBuildProgram) = dlsym(oclLibraryHandle, "clBuildProgram");
 		*(void **)(&myClGetProgramBuildInfo) = dlsym(oclLibraryHandle, "clGetProgramBuildInfo");
 		*(void **)(&myClCreateKernel) = dlsym(oclLibraryHandle, "clCreateKernel");
-		*(void **)(&myClReleaseKernel) = dlsym(oclLibraryHandle, "myClReleaseKernel");
+		*(void **)(&myClReleaseKernel) = dlsym(oclLibraryHandle, "clReleaseKernel");
 		*(void **)(&myClSetKernelArg) = dlsym(oclLibraryHandle, "clSetKernelArg");
-		*(void **)(&myClGetEventProfilingInfo) = dlsym(oclLibraryHandle, "myClGetEventProfilingInfo");
-		*(void **)(&myClFinish) = dlsym(oclLibraryHandle, "myClFinish");
+		*(void **)(&myClGetEventProfilingInfo) = dlsym(oclLibraryHandle, "clGetEventProfilingInfo");
+		*(void **)(&myClFinish) = dlsym(oclLibraryHandle, "clFinish");
 		*(void **)(&myClEnqueueReadBuffer) = dlsym(oclLibraryHandle, "clEnqueueReadBuffer");
 		*(void **)(&myClEnqueueWriteBuffer) = dlsym(oclLibraryHandle, "clEnqueueWriteBuffer");
 		*(void **)(&myClEnqueueNDRangeKernel) = dlsym(oclLibraryHandle, "clEnqueueNDRangeKernel");
@@ -114,6 +115,7 @@ double CLTracker::runCLKernels(cv::Mat &locMat, cv::Mat &frameMetadataF,
 	if (frameNo != -1) {
 		debug = 1;
 	}
+	//debug = 2;
 
 	cl_int err;
 	char buf[256];
@@ -125,6 +127,7 @@ double CLTracker::runCLKernels(cv::Mat &locMat, cv::Mat &frameMetadataF,
 		if (debug > 1) {
 			// write Image
 			sprintf(buf, "/storage/sdcard0/imgc.txt");
+			//sprintf(buf, "/storage/emulated/0/imgc.txt");
 			readImage(kernels["readImage"], mems["imgc"], w_img, h_img, true,
 					buf);
 		}

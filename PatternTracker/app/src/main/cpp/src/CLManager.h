@@ -54,7 +54,7 @@ public:
 	Params params;
 
 public:
-	CLManager();
+	CLManager(char *_oclLibName, char *_eglLibName);
 	~CLManager();
 
 	bool initCL(const char *source);
@@ -66,6 +66,9 @@ public:
 	cl_program m_program;
 
 	size_t max_cu;	//max compute units
+
+	char oclLibraryName[1024];
+	char eglLibraryName[1024];
 
 	 void loadOCLLibrary();
 	 void unloadOCLLibrary();

@@ -196,7 +196,7 @@ Project compilation
 -------------------
 
 First, we shall describe the compilation of Tracker apk. The compilation
-requires latest android studio with latest Android SDK and NDK, available at https://developer.android.com/studio/index.html, and OpenCV 2.4.9 for Android, available at http://opencv.org/downloads.html.
+requires latest android studio with latest Android SDK and NDK, available at https://developer.android.com/studio/index.html, and OpenCV 2.4.13 for Android, available at https://sourceforge.net/projects/opencvlibrary/files/.
 
 To compile the project, 
 
@@ -211,19 +211,10 @@ To compile the project,
 4. Connect your mobile phone and press Run> Run 'app'
 
 
-If it does not run, libEGL.so and libOpenCL.so will need to be extracted
-from the phone and placed at appropriate location. The libEGL.so file
-typically resides in the /system/lib/ directory of the smartphone and
-libOpenCL.so is typically found in /system/vendor/lib/ directory. The
-following commands on windows command prompt can be used to achieve this
-task:   
+It is currently expected to run on Galaxy S6 and Galaxy S7 phones. There are a few things that you can try to make it work on any arbitrary phone:
 
->\>adb shell  
->\>cd storage/sdcard0  
->\>cp /system/lib/libEGL.so .  
->\>cp /system/vendor/lib/libOpenCL.so .  
-
-Then you can copy the two library files from the windows explorer to “PatternTracker\app\src\main\cpp\libs\gs6". It should now be ready to run.
+1. "getLibNames" function in cgt.cpp file might need to be modified in order to load the correct libraries. 
+2. "ShaderManager.java" and "CameraManager.java" might need to be modified to adjust for the capabilities of the new phone.
 
 In order to compile the VR apk, perform the following steps:
 

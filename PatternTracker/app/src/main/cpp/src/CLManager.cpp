@@ -8,7 +8,9 @@
 #include "CLManager.h"
 
 namespace JNICLTracker{
-CLManager::CLManager() {
+CLManager::CLManager(char *_oclLibName, char *_eglLibName) {
+	strcpy(oclLibraryName,_oclLibName);
+	strcpy(eglLibraryName,_eglLibName);
 	loadOCLLibrary();
 	m_clContext = 0;
 	m_queue = 0;
@@ -19,18 +21,14 @@ CLManager::~CLManager() {
 	unloadOCLLibrary();
 }
 
-
-
-
 void	CLManager::unloadOCLLibrary(){
 		dlclose(oclLibraryHandle);
 		dlclose(eglLibraryHandle);
 	}
 
 void	CLManager::loadOCLLibrary(){
-		eglLibraryHandle = dlopen("/system/lib/libEGL.so", RTLD_GLOBAL | RTLD_NOW);
-		oclLibraryHandle = dlopen("/system/vendor/lib/libOpenCL.so", RTLD_GLOBAL | RTLD_NOW);
-
+		oclLibraryHandle = dlopen(oclLibraryName, RTLD_GLOBAL | RTLD_NOW);
+		eglLibraryHandle = dlopen(eglLibraryName, RTLD_GLOBAL | RTLD_NOW);
 
 		*(void **)(&myClGetPlatformIDs) = dlsym(oclLibraryHandle, "clGetPlatformIDs");
 		*(void **)(&myClGetDeviceIDs) = dlsym(oclLibraryHandle, "clGetDeviceIDs");

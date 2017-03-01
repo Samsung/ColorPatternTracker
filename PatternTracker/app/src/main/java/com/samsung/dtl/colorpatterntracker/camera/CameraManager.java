@@ -220,7 +220,7 @@ public class CameraManager {
 		param.setPictureSize(camera_res.x, camera_res.y);
 		param.setPreviewSize(camera_res.x, camera_res.y);
 		param.setJpegQuality(100);
-				
+
         param.set("vrmode", 1);
         param.setRecordingHint(true);
         param.set("fast-fps-mode", 2);

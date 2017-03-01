@@ -22,7 +22,7 @@ namespace JNICLTracker{
 
 class CLTracker {
 public:
-	CLTracker(CLManager * _clManager);
+	CLTracker(CLManager *_clManager, char *_oclLibName);
 	~CLTracker();
 
 	struct int2{
@@ -40,6 +40,9 @@ public:
 	GLuint out_tex;  // output texture
 
 	CLManager *clManager; // opencl manager
+
+	char oclLibraryName[1024];
+	char eglLibraryName[1024];
 
 	cl_mem mem_images[2]; // opencl memory for input and output textures
 
