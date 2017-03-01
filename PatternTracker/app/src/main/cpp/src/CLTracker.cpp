@@ -6,15 +6,52 @@
 #include <exception>
 #include <stdexcept>
 
+
 namespace JNICLTracker{
-CLTracker::CLTracker(CLManager *_clManager) {
+CLTracker::CLTracker(CLManager *_clManager, char *_oclLibName) {
+	strcpy(oclLibraryName,_oclLibName);
+	loadOCLLibrary();
 	clManager = _clManager;
 	m_sz_blk = 5;
 }
 
 CLTracker::~CLTracker() {
+	unloadOCLLibrary();
 }
 
+	void	CLTracker::unloadOCLLibrary(){
+		dlclose(oclLibraryHandle);
+	}
+
+	void	CLTracker::loadOCLLibrary(){
+		oclLibraryHandle = dlopen(oclLibraryName, RTLD_GLOBAL | RTLD_NOW);
+
+		*(void **)(&myClGetPlatformIDs) = dlsym(oclLibraryHandle, "clGetPlatformIDs");
+		*(void **)(&myClGetDeviceIDs) = dlsym(oclLibraryHandle, "clGetDeviceIDs");
+		*(void **)(&myClGetDeviceInfo) = dlsym(oclLibraryHandle, "clGetDeviceInfo");
+		*(void **)(&myClCreateContext) = dlsym(oclLibraryHandle, "clCreateContext");
+		*(void **)(&myClReleaseContext) = dlsym(oclLibraryHandle, "clReleaseContext");
+		*(void **)(&myClReleaseCommandQueue) = dlsym(oclLibraryHandle, "clReleaseCommandQueue");
+		*(void **)(&myClCreateBuffer) = dlsym(oclLibraryHandle, "clCreateBuffer");
+		*(void **)(&myClReleaseMemObject) = dlsym(oclLibraryHandle, "clReleaseMemObject");
+		*(void **)(&myClCreateProgramWithSource) = dlsym(oclLibraryHandle, "clCreateProgramWithSource");
+		*(void **)(&myClReleaseProgram) = dlsym(oclLibraryHandle, "clReleaseProgram");
+		*(void **)(&myClBuildProgram) = dlsym(oclLibraryHandle, "clBuildProgram");
+		*(void **)(&myClGetProgramBuildInfo) = dlsym(oclLibraryHandle, "clGetProgramBuildInfo");
+		*(void **)(&myClCreateKernel) = dlsym(oclLibraryHandle, "clCreateKernel");
+		*(void **)(&myClReleaseKernel) = dlsym(oclLibraryHandle, "clReleaseKernel");
+		*(void **)(&myClSetKernelArg) = dlsym(oclLibraryHandle, "clSetKernelArg");
+		*(void **)(&myClGetEventProfilingInfo) = dlsym(oclLibraryHandle, "clGetEventProfilingInfo");
+		*(void **)(&myClFinish) = dlsym(oclLibraryHandle, "clFinish");
+		*(void **)(&myClEnqueueReadBuffer) = dlsym(oclLibraryHandle, "clEnqueueReadBuffer");
+		*(void **)(&myClEnqueueWriteBuffer) = dlsym(oclLibraryHandle, "clEnqueueWriteBuffer");
+		*(void **)(&myClEnqueueNDRangeKernel) = dlsym(oclLibraryHandle, "clEnqueueNDRangeKernel");
+		*(void **)(&myClCreateCommandQueue) = dlsym(oclLibraryHandle, "clCreateCommandQueue");
+		*(void **)(&myClEnqueueTask) = dlsym(oclLibraryHandle, "clEnqueueTask");
+		*(void **)(&myClEnqueueAcquireGLObjects) = dlsym(oclLibraryHandle, "clEnqueueAcquireGLObjects");
+		*(void **)(&myClEnqueueReleaseGLObjects) = dlsym(oclLibraryHandle, "clEnqueueReleaseGLObjects");
+		*(void **)(&myClCreateFromGLTexture2D) = dlsym(oclLibraryHandle, "clCreateFromGLTexture2D");
+	}
 // initial setup
 bool CLTracker::setupOpenCL(int width, int height, GLuint input_texture,
 		GLuint output_texture) {
@@ -43,21 +80,21 @@ bool CLTracker::runOpenCL(cv::Mat &locMat, cv::Mat &frameMetadataF,
 		bool trackMultiPattern) {
 	cl_int err;
 	//double start = omp_get_wtime();
-	err = clEnqueueAcquireGLObjects(clManager->m_queue, 2, &mem_images[0], 0,
+	err = myClEnqueueAcquireGLObjects(clManager->m_queue, 2, &mem_images[0], 0,
 			NULL, NULL);
 	CHECK_ERROR_OCL(err, "acquiring GL objects", clManager->releaseCL,
 			return false);
-	clFinish(clManager->m_queue);
+	myClFinish(clManager->m_queue);
 
 	print_out("running kernels\n");
 	runCLKernels(locMat, frameMetadataF, frameMetadataI,
 			frameNo, dt, trackMultiPattern);
 
-	err = clEnqueueReleaseGLObjects(clManager->m_queue, 2, &mem_images[0], 0,
+	err = myClEnqueueReleaseGLObjects(clManager->m_queue, 2, &mem_images[0], 0,
 			NULL, NULL);
 	CHECK_ERROR_OCL(err, "releasing GL objects", clManager->releaseCL,
 			return false);
-	clFinish(clManager->m_queue);
+	myClFinish(clManager->m_queue);
 
 	//double end = omp_get_wtime();
 
@@ -78,6 +115,7 @@ double CLTracker::runCLKernels(cv::Mat &locMat, cv::Mat &frameMetadataF,
 	if (frameNo != -1) {
 		debug = 1;
 	}
+	//debug = 2;
 
 	cl_int err;
 	char buf[256];
@@ -89,6 +127,7 @@ double CLTracker::runCLKernels(cv::Mat &locMat, cv::Mat &frameMetadataF,
 		if (debug > 1) {
 			// write Image
 			sprintf(buf, "/storage/sdcard0/imgc.txt");
+			//sprintf(buf, "/storage/emulated/0/imgc.txt");
 			readImage(kernels["readImage"], mems["imgc"], w_img, h_img, true,
 					buf);
 		}
@@ -249,36 +288,36 @@ bool CLTracker::plotCorners(cv::Mat &locMat, float r, float g, float b) {
 	int w_img = img_size.x;
 	int h_img = img_size.y;
 
-	cl_mem mem_9Pts = clCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
+	cl_mem mem_9Pts = myClCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
 			9 * 2 * sizeof(cl_float), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating 9Pts memory", clManager->releaseCL,
 			return false);
-	ret = clEnqueueWriteBuffer(gpuVars.queue, mem_9Pts, CL_TRUE, 0,
+	ret = myClEnqueueWriteBuffer(gpuVars.queue, mem_9Pts, CL_TRUE, 0,
 			9 * 2 * sizeof(cl_float), locMat.data, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	// copy to new Frame
 	gws[0] = 9;
 	gws[1] = 1;
 	lws[0] = 1;
 	lws[1] = 1;
-	ret = clSetKernelArg(kernels["plotCorners"], 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["plotCorners"], 0, sizeof(cl_mem),
 			(void *) &mem_images[1]);
-	ret = clSetKernelArg(kernels["plotCorners"], 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["plotCorners"], 1, sizeof(cl_mem),
 			(void *) &mem_9Pts);
-	ret = clSetKernelArg(kernels["plotCorners"], 2, sizeof(cl_float),
+	ret = myClSetKernelArg(kernels["plotCorners"], 2, sizeof(cl_float),
 			(void *) &r);
-	ret = clSetKernelArg(kernels["plotCorners"], 3, sizeof(cl_float),
+	ret = myClSetKernelArg(kernels["plotCorners"], 3, sizeof(cl_float),
 			(void *) &g);
-	ret = clSetKernelArg(kernels["plotCorners"], 4, sizeof(cl_float),
+	ret = myClSetKernelArg(kernels["plotCorners"], 4, sizeof(cl_float),
 			(void *) &b);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, kernels["plotCorners"], 2, NULL,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, kernels["plotCorners"], 2, NULL,
 			gws, lws, 0, NULL, NULL);
 	CHECK_ERROR_OCL(err, "enqueuing plotCorners kernel", clManager->releaseCL,
 			return false);
-	err = clFinish(gpuVars.queue);
+	err = myClFinish(gpuVars.queue);
 
-	clReleaseMemObject(mem_9Pts);
+	myClReleaseMemObject(mem_9Pts);
 
 	return true;
 }
@@ -308,15 +347,15 @@ bool CLTracker::copyColor(GPUVars &gpuVars) {
 	gws[1] = h_img;
 	lws[0] = 4;
 	lws[1] = 2;
-	ret = clSetKernelArg(kernels["copyInGL"], 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["copyInGL"], 0, sizeof(cl_mem),
 			(void *) &mem_images[0]);
-	ret = clSetKernelArg(kernels["copyInGL"], 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["copyInGL"], 1, sizeof(cl_mem),
 			(void *) &mem_images[1]);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, kernels["copyInGL"], 2, NULL,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, kernels["copyInGL"], 2, NULL,
 			gws, lws, 0, NULL, NULL);
 	CHECK_ERROR_OCL(err, "enqueuing copyInGL kernel", clManager->releaseCL,
 			return false);
-	err = clFinish(gpuVars.queue);
+	err = myClFinish(gpuVars.queue);
 
 	return true;
 }
@@ -363,10 +402,10 @@ bool CLTracker::getRefinedCorners(cv::Mat &locMat, cv::Mat &frameMetadataF,
 }
 
 void CLTracker::unsetCornerRefinementParameters() {
-	clReleaseMemObject(cornerParams.mem_crossIds);
-	clReleaseMemObject(cornerParams.mem_16Pts);
-	clReleaseMemObject(cornerParams.mem_crossPts);
-	clReleaseMemObject(cornerParams.mem_col16Pts);
+	myClReleaseMemObject(cornerParams.mem_crossIds);
+	myClReleaseMemObject(cornerParams.mem_16Pts);
+	myClReleaseMemObject(cornerParams.mem_crossPts);
+	myClReleaseMemObject(cornerParams.mem_col16Pts);
 }
 
 void CLTracker::setWorkingSets(size_t gws0, size_t gws1, size_t lws0,
@@ -393,9 +432,9 @@ bool CLTracker::getRefinedCornersForPattern(cv::Mat &locMat,
 	getCentersFromCorners(mLocations, locMat,
 			cornerParams.mLocRecFromCornerData);
 
-	ret = clEnqueueWriteBuffer(gpuVars.queue, cornerParams.mem_16Pts, CL_TRUE,
+	ret = myClEnqueueWriteBuffer(gpuVars.queue, cornerParams.mem_16Pts, CL_TRUE,
 			0, 16 * 2 * sizeof(cl_float), mLocations.data, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	if (checkTrans) {
 		bool ptsValid = getValidTrans(mLocations, locMat,
@@ -409,22 +448,22 @@ bool CLTracker::getRefinedCornersForPattern(cv::Mat &locMat,
 	}
 
 	CLTracker::setWorkingSets(24, 1, 4, 1);
-	ret = clSetKernelArg(kernels["getLineCrossing"], 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["getLineCrossing"], 0, sizeof(cl_mem),
 			(void *) &mem_images[0]);
-	ret = clSetKernelArg(kernels["getLineCrossing"], 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["getLineCrossing"], 1, sizeof(cl_mem),
 			(void *) &cornerParams.mem_16Pts);
-	ret = clSetKernelArg(kernels["getLineCrossing"], 2, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["getLineCrossing"], 2, sizeof(cl_mem),
 			(void *) &cornerParams.mem_crossIds);
-	ret = clSetKernelArg(kernels["getLineCrossing"], 3, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["getLineCrossing"], 3, sizeof(cl_mem),
 			(void *) &cornerParams.mem_crossPts);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, kernels["getLineCrossing"], 2,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, kernels["getLineCrossing"], 2,
 			NULL, gws, lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
-	ret = clEnqueueReadBuffer(gpuVars.queue, cornerParams.mem_crossPts, CL_TRUE,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, cornerParams.mem_crossPts, CL_TRUE,
 			0, 24 * 2 * sizeof(cl_float), cornerParams.crossPts, 0, NULL, NULL);
 	CHECK_ERROR_OCL(ret, "1", clManager->releaseCL, return false);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	CLTracker::getCornersFromCrossPts(locMat, cornerParams.crossPts);
 	err = CLTracker::getReprojectionAndErrorForPattern(locMat, 10, true);
@@ -440,27 +479,27 @@ bool CLTracker::getRefinedCornersForPattern(cv::Mat &locMat,
 
 		// marking detected points
 		print_out("running marking\n");
-		cl_mem mem_9Pts = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+		cl_mem mem_9Pts = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 				9 * 2 * sizeof(cl_float), NULL, &err);
 		CHECK_ERROR_OCL(err, "creating 9Pts memory", clManager->releaseCL,
 				return false);
-		ret = clEnqueueWriteBuffer(gpuVars.queue, mem_9Pts, CL_TRUE, 0,
+		ret = myClEnqueueWriteBuffer(gpuVars.queue, mem_9Pts, CL_TRUE, 0,
 				9 * 2 * sizeof(cl_float), locMat.data, 0, NULL, NULL);
-		clFinish(gpuVars.queue);
+		myClFinish(gpuVars.queue);
 
 		gws[0] = 9;
 		gws[1] = 1;
 		lws[0] = 1;
 		lws[1] = 1;
-		ret = clSetKernelArg(kernels["markDetectedCorners"], 0, sizeof(cl_mem),
+		ret = myClSetKernelArg(kernels["markDetectedCorners"], 0, sizeof(cl_mem),
 				(void *) &mem_images[1]);
-		ret = clSetKernelArg(kernels["markDetectedCorners"], 1, sizeof(cl_mem),
+		ret = myClSetKernelArg(kernels["markDetectedCorners"], 1, sizeof(cl_mem),
 				(void *) &mem_9Pts);
-		err = clEnqueueNDRangeKernel(gpuVars.queue,
+		err = myClEnqueueNDRangeKernel(gpuVars.queue,
 				kernels["markDetectedCorners"], 2, NULL, gws, lws, 0, NULL,
 				NULL);
-		clFinish(gpuVars.queue);
-		clReleaseMemObject(mem_9Pts);
+		myClFinish(gpuVars.queue);
+		myClReleaseMemObject(mem_9Pts);
 	}
 // debug
 
@@ -620,31 +659,31 @@ bool CLTracker::getPatternIdAndIntensity(cv::Mat &locMat, cv::Mat &frameMetadata
 			+ (endPts[0][1] - endPts[4][1]) / 2;
 
 	// get pattern colors
-	cl_mem mem_12Pts = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+	cl_mem mem_12Pts = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 			12 * 2 * sizeof(cl_float), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating 12Pts memory", clManager->releaseCL,
 			return false);
-	ret = clEnqueueWriteBuffer(gpuVars.queue, mem_12Pts, CL_TRUE, 0,
+	ret = myClEnqueueWriteBuffer(gpuVars.queue, mem_12Pts, CL_TRUE, 0,
 			12 * 2 * sizeof(cl_float), endPtsXY.data, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	gws[0] = 12;
 	gws[1] = 1;
 	lws[0] = 1;
 	lws[1] = 1;
-	ret = clSetKernelArg(kernels["getPatternIndicator"], 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["getPatternIndicator"], 0, sizeof(cl_mem),
 			(void *) &mem_images[0]);
-	ret = clSetKernelArg(kernels["getPatternIndicator"], 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(kernels["getPatternIndicator"], 1, sizeof(cl_mem),
 			(void *) &mem_12Pts);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, kernels["getPatternIndicator"],
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, kernels["getPatternIndicator"],
 			2, NULL, gws, lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	float tempVec[24];
-	ret = clEnqueueReadBuffer(gpuVars.queue, mem_12Pts, CL_TRUE, 0,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, mem_12Pts, CL_TRUE, 0,
 			12 * 2 * sizeof(cl_float), tempVec, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
-	clReleaseMemObject(mem_12Pts);
+	myClFinish(gpuVars.queue);
+	myClReleaseMemObject(mem_12Pts);
 
 	print_out(
 			"patID [%f %f] [%f %f] [%f %f] [%f %f] [%f %f] [%f %f] [%f %f] [%f %f] [%f %f] [%f %f] [%f %f] [%f %f]",
@@ -667,13 +706,13 @@ bool CLTracker::getPatternIdAndIntensity(cv::Mat &locMat, cv::Mat &frameMetadata
 		int patternId = frameMetadataI.at<int>(0, 0);
 		if (patternId == -1)
 			return true;
-		cl_mem mem_12Pts2 = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+		cl_mem mem_12Pts2 = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 				12 * 2 * sizeof(cl_float), NULL, &err);
 		CHECK_ERROR_OCL(err, "creating 12Pts memory", clManager->releaseCL,
 				return false);
-		ret = clEnqueueWriteBuffer(gpuVars.queue, mem_12Pts2, CL_TRUE, 0,
+		ret = myClEnqueueWriteBuffer(gpuVars.queue, mem_12Pts2, CL_TRUE, 0,
 				12 * 2 * sizeof(cl_float), endPtsXY.data, 0, NULL, NULL);
-		clFinish(gpuVars.queue);
+		myClFinish(gpuVars.queue);
 
 		float r, g, b;
 		if (patternId == -1) {
@@ -716,22 +755,22 @@ bool CLTracker::getPatternIdAndIntensity(cv::Mat &locMat, cv::Mat &frameMetadata
 		gws[1] = 1;
 		lws[0] = 1;
 		lws[1] = 1;
-		ret = clSetKernelArg(kernels["plotCorners"], 0, sizeof(cl_mem),
+		ret = myClSetKernelArg(kernels["plotCorners"], 0, sizeof(cl_mem),
 				(void *) &mem_images[1]);
-		ret = clSetKernelArg(kernels["plotCorners"], 1, sizeof(cl_mem),
+		ret = myClSetKernelArg(kernels["plotCorners"], 1, sizeof(cl_mem),
 				(void *) &mem_12Pts2);
-		ret = clSetKernelArg(kernels["plotCorners"], 2, sizeof(cl_float),
+		ret = myClSetKernelArg(kernels["plotCorners"], 2, sizeof(cl_float),
 				(void *) &r);
-		ret = clSetKernelArg(kernels["plotCorners"], 3, sizeof(cl_float),
+		ret = myClSetKernelArg(kernels["plotCorners"], 3, sizeof(cl_float),
 				(void *) &g);
-		ret = clSetKernelArg(kernels["plotCorners"], 4, sizeof(cl_float),
+		ret = myClSetKernelArg(kernels["plotCorners"], 4, sizeof(cl_float),
 				(void *) &b);
-		err = clEnqueueNDRangeKernel(gpuVars.queue, kernels["plotCorners"], 2,
+		err = myClEnqueueNDRangeKernel(gpuVars.queue, kernels["plotCorners"], 2,
 				NULL, gws, lws, 0, NULL, NULL);
 		CHECK_ERROR_OCL(err, "enqueuing plotCorners kernel",
 				clManager->releaseCL, return false);
-		err = clFinish(gpuVars.queue);
-		clReleaseMemObject(mem_12Pts2);
+		err = myClFinish(gpuVars.queue);
+		myClReleaseMemObject(mem_12Pts2);
 	}
 	return true;
 }
@@ -914,7 +953,7 @@ bool CLTracker::getValidTrans(cv::Mat &mLocations, cv::Mat &locMat,
 	int n_check = (2 * nx_check + 1) * (2 * ny_check + 1) * (2 * nt_check + 1);
 
 	cl_uchar * transValidity = (cl_uchar*) malloc(n_check * sizeof(cl_uchar));
-	cl_mem mem_transValidity = clCreateBuffer(gpuVars.context,
+	cl_mem mem_transValidity = myClCreateBuffer(gpuVars.context,
 			CL_MEM_READ_WRITE, n_check * sizeof(cl_uchar), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating transvalidity memory", clManager->releaseCL,
 			return false);
@@ -925,23 +964,23 @@ bool CLTracker::getValidTrans(cv::Mat &mLocations, cv::Mat &locMat,
 	lws[1] = 2;
 
 	cl_kernel knl_validity = kernels["getTransValidity"];
-	ret = clSetKernelArg(knl_validity, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_validity, 0, sizeof(cl_mem),
 			(void *) &mem_images[0]);
-	ret = clSetKernelArg(knl_validity, 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_validity, 1, sizeof(cl_mem),
 			(void *) &mem_transValidity);
-	ret = clSetKernelArg(knl_validity, 2, sizeof(cl_mem), (void *) &mem_16Pts);
-	ret = clSetKernelArg(knl_validity, 3, sizeof(cl_float), (void *) &x_mid);
-	ret = clSetKernelArg(knl_validity, 4, sizeof(cl_float), (void *) &y_mid);
-	ret = clSetKernelArg(knl_validity, 5, sizeof(cl_float), (void *) &angle);
-	ret = clSetKernelArg(knl_validity, 6, sizeof(cl_float), (void *) &d_w);
-	ret = clSetKernelArg(knl_validity, 7, sizeof(cl_float), (void *) &d_h);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_validity, 2, NULL, gws, lws,
+	ret = myClSetKernelArg(knl_validity, 2, sizeof(cl_mem), (void *) &mem_16Pts);
+	ret = myClSetKernelArg(knl_validity, 3, sizeof(cl_float), (void *) &x_mid);
+	ret = myClSetKernelArg(knl_validity, 4, sizeof(cl_float), (void *) &y_mid);
+	ret = myClSetKernelArg(knl_validity, 5, sizeof(cl_float), (void *) &angle);
+	ret = myClSetKernelArg(knl_validity, 6, sizeof(cl_float), (void *) &d_w);
+	ret = myClSetKernelArg(knl_validity, 7, sizeof(cl_float), (void *) &d_h);
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_validity, 2, NULL, gws, lws,
 			0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
-	ret = clEnqueueReadBuffer(gpuVars.queue, mem_transValidity, CL_TRUE, 0,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, mem_transValidity, CL_TRUE, 0,
 			n_check * sizeof(cl_uchar), transValidity, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	int count = 0;
 	int closest_dist = 100;
@@ -984,7 +1023,7 @@ bool CLTracker::getValidTrans(cv::Mat &mLocations, cv::Mat &locMat,
 				+ y_mid;
 	}
 
-	clReleaseMemObject(mem_transValidity);
+	myClReleaseMemObject(mem_transValidity);
 	free(transValidity);
 	return true;
 }
@@ -1052,39 +1091,39 @@ bool CLTracker::extractCornersAndPatternVotes(cl_kernel & knl_resetNCorners,
 	lws[1] = 2;
 
 	nCorners = 0;
-	cl_mem memobj_nCorners = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+	cl_mem memobj_nCorners = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 			sizeof(cl_int), NULL, &err);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 	CHECK_ERROR_OCL(err, "creating ncorner memory", clManager->releaseCL,
 			return false);
 
 	print_out("debug 1\n");
 
 	// set ncorners to zero
-	ret = clEnqueueWriteBuffer(gpuVars.queue, memobj_nCorners, CL_TRUE, 0,
+	ret = myClEnqueueWriteBuffer(gpuVars.queue, memobj_nCorners, CL_TRUE, 0,
 			sizeof(cl_int), &nCorners, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 	CHECK_ERROR_OCL(ret, "writing nCorners", clManager->releaseCL, return false);
 
 	print_out("debug 2\n");
 	// get nCorners
-	ret = clSetKernelArg(knl_getNCorners, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getNCorners, 0, sizeof(cl_mem),
 			(void *) &memobj_corners);
-	ret = clSetKernelArg(knl_getNCorners, 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getNCorners, 1, sizeof(cl_mem),
 			(void *) &memobj_nCorners);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_getNCorners, 2, NULL, gws,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_getNCorners, 2, NULL, gws,
 			lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 	print_out("debug 3\n");
 
-	ret = clEnqueueReadBuffer(gpuVars.queue, memobj_nCorners, CL_TRUE, 0,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_nCorners, CL_TRUE, 0,
 			sizeof(cl_int), &nCorners, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
-	ret = clSetKernelArg(knl_resetNCorners, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_resetNCorners, 0, sizeof(cl_mem),
 			(void *) &memobj_nCorners);
-	clEnqueueTask(gpuVars.queue, knl_resetNCorners, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClEnqueueTask(gpuVars.queue, knl_resetNCorners, 0, NULL, NULL);
+	myClFinish(gpuVars.queue);
 
 	print_out("debug 4\n");
 
@@ -1093,24 +1132,24 @@ bool CLTracker::extractCornersAndPatternVotes(cl_kernel & knl_resetNCorners,
 	cl_float *yCorners = (cl_float *) malloc(nCorners * sizeof(cl_float));
 
 	// create memory objects for pts
-	cl_mem memobj_cornersX = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+	cl_mem memobj_cornersX = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 			nCorners * sizeof(cl_float), NULL, &err);
-	cl_mem memobj_cornersY = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+	cl_mem memobj_cornersY = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 			nCorners * sizeof(cl_float), NULL, &err);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 	print_out("debug 5\n");
 
-	ret = clSetKernelArg(knl_getCorners, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getCorners, 0, sizeof(cl_mem),
 			(void *) &memobj_cornersX);
-	ret = clSetKernelArg(knl_getCorners, 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getCorners, 1, sizeof(cl_mem),
 			(void *) &memobj_cornersY);
-	ret = clSetKernelArg(knl_getCorners, 2, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getCorners, 2, sizeof(cl_mem),
 			(void *) &memobj_corners);
-	ret = clSetKernelArg(knl_getCorners, 3, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getCorners, 3, sizeof(cl_mem),
 			(void *) &memobj_nCorners);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_getCorners, 2, NULL, gws,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_getCorners, 2, NULL, gws,
 			lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 	print_out("debug 6\n");
 
 	int deg_eq = 27; // to store some intermediate and debug information
@@ -1124,17 +1163,17 @@ bool CLTracker::extractCornersAndPatternVotes(cl_kernel & knl_resetNCorners,
 
 	print_out("debug 7 nCorners:%d\n",nCorners);
 	// allocate nCorners*9 array indicating votes for each point
-	cl_mem memobj_cornersVote = clCreateBuffer(gpuVars.context,
+	cl_mem memobj_cornersVote = myClCreateBuffer(gpuVars.context,
 			CL_MEM_READ_WRITE, nCorners * 9 * sizeof(cl_int), NULL, &err);
 
 	// initialize votes
 	if(nCorners>0){
-	ret = clEnqueueWriteBuffer(gpuVars.queue, memobj_cornersVote, CL_TRUE, 0,
+	ret = myClEnqueueWriteBuffer(gpuVars.queue, memobj_cornersVote, CL_TRUE, 0,
 			nCorners * 9 * sizeof(cl_int), votes, 0, NULL, NULL);
 	}
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
-	cl_mem memobj_lineEqns = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+	cl_mem memobj_lineEqns = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 			nCorners * nCorners * deg_eq * sizeof(cl_int), NULL, &err);
 
 	print_out("debug 8\n");
@@ -1144,39 +1183,39 @@ bool CLTracker::extractCornersAndPatternVotes(cl_kernel & knl_resetNCorners,
 	gws[1] = nCorners;
 	lws[0] = 1;
 	lws[1] = 1;
-	ret = clSetKernelArg(knl_getLinePtAssignment, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getLinePtAssignment, 0, sizeof(cl_mem),
 			(void *) &memobj_cornersVote);
-	ret = clSetKernelArg(knl_getLinePtAssignment, 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getLinePtAssignment, 1, sizeof(cl_mem),
 			(void *) &memobj_in);
-	ret = clSetKernelArg(knl_getLinePtAssignment, 2, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getLinePtAssignment, 2, sizeof(cl_mem),
 			(void *) &memobj_lineEqns);
-	ret = clSetKernelArg(knl_getLinePtAssignment, 3, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getLinePtAssignment, 3, sizeof(cl_mem),
 			(void *) &memobj_cornersY);
-	ret = clSetKernelArg(knl_getLinePtAssignment, 4, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getLinePtAssignment, 4, sizeof(cl_mem),
 			(void *) &memobj_cornersX);
-	ret = clSetKernelArg(knl_getLinePtAssignment, 5, sizeof(cl_int),
+	ret = myClSetKernelArg(knl_getLinePtAssignment, 5, sizeof(cl_int),
 			(void *) &h_img);
-	ret = clSetKernelArg(knl_getLinePtAssignment, 6, sizeof(cl_int),
+	ret = myClSetKernelArg(knl_getLinePtAssignment, 6, sizeof(cl_int),
 			(void *) &w_img);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_getLinePtAssignment, 2,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_getLinePtAssignment, 2,
 			NULL, gws, lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	print_out("debug 9\n");
 
 	// read back corners
 	if(nCorners>0){
-	ret = clEnqueueReadBuffer(gpuVars.queue, memobj_lineEqns, CL_TRUE, 0,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_lineEqns, CL_TRUE, 0,
 			nCorners * nCorners * deg_eq * sizeof(cl_float), eqns, 0, NULL,
 			NULL);
-	ret = clEnqueueReadBuffer(gpuVars.queue, memobj_cornersVote, CL_TRUE, 0,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_cornersVote, CL_TRUE, 0,
 			nCorners * 9 * sizeof(cl_int), votes, 0, NULL, NULL);
-	ret = clEnqueueReadBuffer(gpuVars.queue, memobj_cornersX, CL_TRUE, 0,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_cornersX, CL_TRUE, 0,
 			nCorners * sizeof(cl_float), xCorners, 0, NULL, NULL);
-	ret = clEnqueueReadBuffer(gpuVars.queue, memobj_cornersY, CL_TRUE, 0,
+	ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_cornersY, CL_TRUE, 0,
 			nCorners * sizeof(cl_float), yCorners, 0, NULL, NULL);
 	}
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	print_out("debug 10\n");
 
@@ -1204,11 +1243,11 @@ bool CLTracker::extractCornersAndPatternVotes(cl_kernel & knl_resetNCorners,
 
 	print_out("debug 11\n");
 
-	clReleaseMemObject(memobj_lineEqns);
-	clReleaseMemObject(memobj_cornersVote);
-	clReleaseMemObject(memobj_cornersX);
-	clReleaseMemObject(memobj_cornersY);
-	clReleaseMemObject(memobj_nCorners);
+	myClReleaseMemObject(memobj_lineEqns);
+	myClReleaseMemObject(memobj_cornersVote);
+	myClReleaseMemObject(memobj_cornersX);
+	myClReleaseMemObject(memobj_cornersY);
+	myClReleaseMemObject(memobj_nCorners);
 
 	return true;
 }
@@ -1845,11 +1884,11 @@ int CLTracker::getBlockCorners(cl_kernel &knl_cornersZero,
 	lws[0] = 4;
 	lws[1] = 2;
 
-	ret = clSetKernelArg(knl_cornersZero, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_cornersZero, 0, sizeof(cl_mem),
 			(void *) &memobj_corners);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_cornersZero, 2, NULL, gws,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_cornersZero, 2, NULL, gws,
 			lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	gws[0] = w_img / m_sz_blk;
 	gws[1] = h_img / m_sz_blk;
@@ -1858,52 +1897,52 @@ int CLTracker::getBlockCorners(cl_kernel &knl_cornersZero,
 
 	cl_int sz_step = m_sz_blk;
 
-	ret = clSetKernelArg(knl_getBlockCorners, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getBlockCorners, 0, sizeof(cl_mem),
 			(void *) &memobj_in);
-	ret = clSetKernelArg(knl_getBlockCorners, 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getBlockCorners, 1, sizeof(cl_mem),
 			(void *) &memobj_corners);
-	ret = clSetKernelArg(knl_getBlockCorners, 2, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_getBlockCorners, 2, sizeof(cl_mem),
 			(void *) &memobj_purity);
-	ret = clSetKernelArg(knl_getBlockCorners, 3, sizeof(cl_int),
+	ret = myClSetKernelArg(knl_getBlockCorners, 3, sizeof(cl_int),
 			(cl_int *) &sz_step);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_getBlockCorners, 2, NULL,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_getBlockCorners, 2, NULL,
 			gws, lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	// refine corner points
 	gws[0] = w_img;
 	gws[1] = h_img;
 	lws[0] = 4;
 	lws[1] = 2;
-	ret = clSetKernelArg(knl_cornersZero, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_cornersZero, 0, sizeof(cl_mem),
 			(void *) &memobj_cornersNew);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_cornersZero, 2, NULL, gws,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_cornersZero, 2, NULL, gws,
 			lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
-	ret = clSetKernelArg(knl_refineCornerPoints, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_refineCornerPoints, 0, sizeof(cl_mem),
 			(void *) &memobj_corners);
-	ret = clSetKernelArg(knl_refineCornerPoints, 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_refineCornerPoints, 1, sizeof(cl_mem),
 			(void *) &memobj_cornersNew);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_refineCornerPoints, 2, NULL,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_refineCornerPoints, 2, NULL,
 			gws, lws, 0, NULL, NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	if (saveOutput) {
 		cl_uchar *tempVec = (cl_uchar*) malloc(
 				w_img * h_img * sizeof(cl_uchar));
-		cl_int ret = clEnqueueReadBuffer(gpuVars.queue, memobj_corners, CL_TRUE,
+		cl_int ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_corners, CL_TRUE,
 				0, w_img * h_img * sizeof(cl_uchar), tempVec, 0, NULL, NULL);
-		clFinish(gpuVars.queue);
+		myClFinish(gpuVars.queue);
 
 		FILE *fid = fopen(fname, "w");
 		for (int i = 0; i < w_img * h_img; i++)
 			fprintf(fid, "%d ", (int) tempVec[i]);
 		fclose(fid);
 
-		ret = clEnqueueReadBuffer(gpuVars.queue, memobj_cornersNew, CL_TRUE, 0,
+		ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_cornersNew, CL_TRUE, 0,
 				w_img * h_img * sizeof(cl_uchar), tempVec, 0, NULL, NULL);
-		clFinish(gpuVars.queue);
+		myClFinish(gpuVars.queue);
 
 		fid = fopen(fname2, "w");
 		for (int i = 0; i < w_img * h_img; i++)
@@ -1924,21 +1963,21 @@ bool CLTracker::readImage(cl_kernel &knl_readImg, cl_mem &memobj_imgc, int w_img
 	lws[0] = 4;
 	lws[1] = 2;
 
-	ret = clSetKernelArg(knl_readImg, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_readImg, 0, sizeof(cl_mem),
 			(void *) &mem_images[0]);
-	ret = clSetKernelArg(knl_readImg, 1, sizeof(cl_mem), (void *) &memobj_imgc);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_readImg, 2, NULL, gws, lws,
+	ret = myClSetKernelArg(knl_readImg, 1, sizeof(cl_mem), (void *) &memobj_imgc);
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_readImg, 2, NULL, gws, lws,
 			0, NULL, NULL);
 	CHECK_ERROR_OCL(err, "enqueuing read Image computation kernel",
 			clManager->releaseCL, return false);
-	err = clFinish(gpuVars.queue);
+	err = myClFinish(gpuVars.queue);
 
 	if (saveOutput) {
 		cl_uchar *tempVec = (cl_uchar*) malloc(
 				w_img * h_img * sizeof(cl_uchar) * 3);
-		ret = clEnqueueReadBuffer(gpuVars.queue, memobj_imgc, CL_TRUE, 0,
+		ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_imgc, CL_TRUE, 0,
 				w_img * h_img * sizeof(cl_uchar) * 3, tempVec, 0, NULL, NULL);
-		clFinish(gpuVars.queue);
+		myClFinish(gpuVars.queue);
 
 		FILE *fid = fopen(fname, "w");
 		for (int i = 0; i < w_img * h_img * 3; i += 1)
@@ -1962,24 +2001,24 @@ bool CLTracker::getColorPurity(cl_kernel &knl_purity, cl_mem &memobj_purity,
 
 	int skip = 2;
 
-	ret = clSetKernelArg(knl_purity, 0, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_purity, 0, sizeof(cl_mem),
 			(void *) &mem_images[0]);
-	ret = clSetKernelArg(knl_purity, 1, sizeof(cl_mem),
+	ret = myClSetKernelArg(knl_purity, 1, sizeof(cl_mem),
 			(void *) &memobj_purity);
-	ret = clSetKernelArg(knl_purity, 2, sizeof(cl_int), (void *) &m_sz_blk);
-	ret = clSetKernelArg(knl_purity, 3, sizeof(cl_int), (void *) &skip);
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_purity, 2, NULL, gws, lws,
+	ret = myClSetKernelArg(knl_purity, 2, sizeof(cl_int), (void *) &m_sz_blk);
+	ret = myClSetKernelArg(knl_purity, 3, sizeof(cl_int), (void *) &skip);
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_purity, 2, NULL, gws, lws,
 			0, NULL, NULL);
 	CHECK_ERROR_OCL(err, "enqueuing purity computation kernel",
 			clManager->releaseCL, return false);
-	err = clFinish(gpuVars.queue);
+	err = myClFinish(gpuVars.queue);
 
 	if (saveOutput) {
 		cl_uchar *tempVec = (cl_uchar*) malloc(
 				w_purity * h_purity * sizeof(cl_uchar));
-		ret = clEnqueueReadBuffer(gpuVars.queue, memobj_purity, CL_TRUE, 0,
+		ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_purity, CL_TRUE, 0,
 				w_purity * h_purity * sizeof(cl_uchar), tempVec, 0, NULL, NULL);
-		clFinish(gpuVars.queue);
+		myClFinish(gpuVars.queue);
 
 		FILE *fid = fopen(fname, "w");
 		for (int i = 0; i < w_purity * h_purity; i++)
@@ -2009,32 +2048,32 @@ bool CLTracker::colorConversion(cl_kernel &knl_colConversion, cl_mem &memobj_in,
 	lws[0] = 4;
 	lws[1] = 2;
 
-	err = clSetKernelArg(knl_colConversion, 0, sizeof(cl_mem), &mem_images[0]);
+	err = myClSetKernelArg(knl_colConversion, 0, sizeof(cl_mem), &mem_images[0]);
 	CHECK_ERROR_OCL(err, "setting  colConversionCopyGL arguments - 0",
 			clManager->releaseCL, return false);
-	err = clSetKernelArg(knl_colConversion, 1, sizeof(cl_mem), &memobj_in);
+	err = myClSetKernelArg(knl_colConversion, 1, sizeof(cl_mem), &memobj_in);
 	CHECK_ERROR_OCL(err, "setting  colConversionCopyGL arguments - 1",
 			clManager->releaseCL, return false);
-	err = clSetKernelArg(knl_colConversion, 2, sizeof(cl_int), &n_pixels);
+	err = myClSetKernelArg(knl_colConversion, 2, sizeof(cl_int), &n_pixels);
 	CHECK_ERROR_OCL(err, "setting  colConversionCopyGL arguments - 2",
 			clManager->releaseCL, return false);
 
-	err = clEnqueueNDRangeKernel(gpuVars.queue, knl_colConversion, 2, NULL, gws,
+	err = myClEnqueueNDRangeKernel(gpuVars.queue, knl_colConversion, 2, NULL, gws,
 			lws, 0, NULL, NULL);
 	CHECK_ERROR_OCL(err, "enqueuing colConversionGL kernel",
 			clManager->releaseCL, return false);
-	err = clFinish(gpuVars.queue);
+	err = myClFinish(gpuVars.queue);
 	CHECK_ERROR_OCL(err, "finishing colConversionGL kernel",
 			clManager->releaseCL, return false);
 
 	if (saveOutput) {
 		cl_uchar *tempVec = (cl_uchar*) malloc(
 				w_img * h_img * sizeof(cl_uchar));
-		cl_int ret = clEnqueueReadBuffer(gpuVars.queue, memobj_in, CL_TRUE, 0,
+		cl_int ret = myClEnqueueReadBuffer(gpuVars.queue, memobj_in, CL_TRUE, 0,
 				w_img * h_img * sizeof(cl_uchar), tempVec, 0, NULL, NULL);
 		CHECK_ERROR_OCL(ret, "enqueue colConversionGL reading",
 				clManager->releaseCL, return false);
-		err = clFinish(gpuVars.queue);
+		err = myClFinish(gpuVars.queue);
 		CHECK_ERROR_OCL(err, "finishing colConversionGL reading",
 				clManager->releaseCL, return false);
 
@@ -2058,32 +2097,32 @@ bool CLTracker::colorConversion(cl_kernel &knl_colConversion, cl_mem &memobj_in,
 
 bool CLTracker::cleanupOpenCL() {
 	CLTracker::unsetCornerRefinementParameters();
-	clReleaseMemObject(mem_images[0]);
-	clReleaseMemObject(mem_images[1]);
-	clReleaseMemObject(mems["img"]);
-	clReleaseMemObject(mems["corners"]);
-	clReleaseMemObject(mems["cornersNew"]);
-	clReleaseMemObject(mems["purity"]);
-	clReleaseMemObject(mems["imgc"]);
+	myClReleaseMemObject(mem_images[0]);
+	myClReleaseMemObject(mem_images[1]);
+	myClReleaseMemObject(mems["img"]);
+	myClReleaseMemObject(mems["corners"]);
+	myClReleaseMemObject(mems["cornersNew"]);
+	myClReleaseMemObject(mems["purity"]);
+	myClReleaseMemObject(mems["imgc"]);
 
-	clReleaseKernel(kernels["colConversionGL"]);
-	clReleaseKernel(kernels["colConversionCopyGL"]);
+	myClReleaseKernel(kernels["colConversionGL"]);
+	myClReleaseKernel(kernels["colConversionCopyGL"]);
 
-	clReleaseKernel(kernels["getColorPurity"]);
-	clReleaseKernel(kernels["cornersZero"]);
-	clReleaseKernel(kernels["getBlockCorners"]);
-	clReleaseKernel(kernels["refineCorners"]);
-	clReleaseKernel(kernels["resetNCorners"]);
-	clReleaseKernel(kernels["getCorners"]);
-	clReleaseKernel(kernels["getLinePtAssignment"]);
-	clReleaseKernel(kernels["markDetectedCorners"]);
-	clReleaseKernel(kernels["getLineCrossing"]);
-	clReleaseKernel(kernels["getColPixels"]);
-	clReleaseKernel(kernels["getTransValidity"]);
-	clReleaseKernel(kernels["getPatternIndicator"]);
-	clReleaseKernel(kernels["copyInGL"]);
-	clReleaseKernel(kernels["readImage"]);
-	clReleaseKernel(kernels["plotCorners"]);
+	myClReleaseKernel(kernels["getColorPurity"]);
+	myClReleaseKernel(kernels["cornersZero"]);
+	myClReleaseKernel(kernels["getBlockCorners"]);
+	myClReleaseKernel(kernels["refineCorners"]);
+	myClReleaseKernel(kernels["resetNCorners"]);
+	myClReleaseKernel(kernels["getCorners"]);
+	myClReleaseKernel(kernels["getLinePtAssignment"]);
+	myClReleaseKernel(kernels["markDetectedCorners"]);
+	myClReleaseKernel(kernels["getLineCrossing"]);
+	myClReleaseKernel(kernels["getColPixels"]);
+	myClReleaseKernel(kernels["getTransValidity"]);
+	myClReleaseKernel(kernels["getPatternIndicator"]);
+	myClReleaseKernel(kernels["copyInGL"]);
+	myClReleaseKernel(kernels["readImage"]);
+	myClReleaseKernel(kernels["plotCorners"]);
 	clManager->releaseCL();
 	return true;
 }
@@ -2248,27 +2287,27 @@ bool CLTracker::setCornerRefinementParameters() {
 	setParamsCenterToCorner(cornerParams.mLocRecFromCornerData);
 	getCrossIds(cornerParams.crossIDs);
 
-	cornerParams.mem_crossIds = clCreateBuffer(gpuVars.context,
+	cornerParams.mem_crossIds = myClCreateBuffer(gpuVars.context,
 			CL_MEM_READ_WRITE, 24 * 2 * sizeof(cl_int), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating crossIds memory", clManager->releaseCL,
 			return false);
-	cornerParams.mem_16Pts = clCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
+	cornerParams.mem_16Pts = myClCreateBuffer(gpuVars.context, CL_MEM_READ_WRITE,
 			16 * 2 * sizeof(cl_float), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating 16Pts memory", clManager->releaseCL,
 			return false);
-	cornerParams.mem_crossPts = clCreateBuffer(gpuVars.context,
+	cornerParams.mem_crossPts = myClCreateBuffer(gpuVars.context,
 			CL_MEM_READ_WRITE, 24 * 2 * sizeof(cl_float), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating crossPts memory", clManager->releaseCL,
 			return false);
-	cornerParams.mem_col16Pts = clCreateBuffer(gpuVars.context,
+	cornerParams.mem_col16Pts = myClCreateBuffer(gpuVars.context,
 			CL_MEM_READ_WRITE, 16 * 3 * sizeof(cl_float), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating 16PtsColor memory", clManager->releaseCL,
 			return false);
 
-	ret = clEnqueueWriteBuffer(gpuVars.queue, cornerParams.mem_crossIds,
+	ret = myClEnqueueWriteBuffer(gpuVars.queue, cornerParams.mem_crossIds,
 			CL_TRUE, 0, 24 * 2 * sizeof(cl_int), cornerParams.crossIDs, 0, NULL,
 			NULL);
-	clFinish(gpuVars.queue);
+	myClFinish(gpuVars.queue);
 
 	cornerParams.ptsTM = cv::Mat::ones(9, 1, CV_32FC2);
 	cornerParams.ptsTM_homo = cv::Mat::ones(9, 3, CV_32FC1);
@@ -2287,87 +2326,87 @@ bool CLTracker::setCornerRefinementParameters() {
 
 bool CLTracker::initializeGPUKernels() {
 	cl_int err;
-	kernels["colConversionGL"] = clCreateKernel(clManager->m_program,
+	kernels["colConversionGL"] = myClCreateKernel(clManager->m_program,
 			"colConversionGL", &err);
 	CHECK_ERROR_OCL(err, "creating colConversionGL kernel",
 			clManager->releaseCL, return false);
 
-	kernels["getColorPurity"] = clCreateKernel(clManager->m_program,
+	kernels["getColorPurity"] = myClCreateKernel(clManager->m_program,
 			"getColorPurity", &err);
 	CHECK_ERROR_OCL(err, "creating getColorPurity kernel", clManager->releaseCL,
 			return false);
 
-	kernels["readImage"] = clCreateKernel(clManager->m_program, "readImage",
+	kernels["readImage"] = myClCreateKernel(clManager->m_program, "readImage",
 			&err);
 	CHECK_ERROR_OCL(err, "creating readImage kernel", clManager->releaseCL,
 			return false);
 
-	kernels["cornersZero"] = clCreateKernel(clManager->m_program, "cornersZero",
+	kernels["cornersZero"] = myClCreateKernel(clManager->m_program, "cornersZero",
 			&err);
 	CHECK_ERROR_OCL(err, "creating cornersZero kernel", clManager->releaseCL,
 			return false);
 
-	kernels["getBlockCorners"] = clCreateKernel(clManager->m_program,
+	kernels["getBlockCorners"] = myClCreateKernel(clManager->m_program,
 			"getBlockCorners10", &err);
 	CHECK_ERROR_OCL(err, "creating getBlockCorners kernel",
 			clManager->releaseCL, return false);
 
-	kernels["refineCorners"] = clCreateKernel(clManager->m_program,
+	kernels["refineCorners"] = myClCreateKernel(clManager->m_program,
 			"refineCorners", &err);
 	CHECK_ERROR_OCL(err, "creating refineCornerPoints kernel",
 			clManager->releaseCL, return false);
 
-	kernels["resetNCorners"] = clCreateKernel(clManager->m_program,
+	kernels["resetNCorners"] = myClCreateKernel(clManager->m_program,
 			"resetNCorners", &err);
 	CHECK_ERROR_OCL(err, "creating resetNCorners kernel", clManager->releaseCL,
 			return false);
 
-	kernels["getNCorners"] = clCreateKernel(clManager->m_program, "getNCorners",
+	kernels["getNCorners"] = myClCreateKernel(clManager->m_program, "getNCorners",
 			&err);
 	CHECK_ERROR_OCL(err, "creating getNCorners kernel", clManager->releaseCL,
 			return false);
 
-	kernels["getCorners"] = clCreateKernel(clManager->m_program, "getCorners",
+	kernels["getCorners"] = myClCreateKernel(clManager->m_program, "getCorners",
 			&err);
 	CHECK_ERROR_OCL(err, "creating getCorners kernel", clManager->releaseCL,
 			return false);
 
-	kernels["getLinePtAssignment"] = clCreateKernel(clManager->m_program,
+	kernels["getLinePtAssignment"] = myClCreateKernel(clManager->m_program,
 			"getLinePtAssignment", &err);
 	CHECK_ERROR_OCL(err, "creating getLinePtAssignment kernel",
 			clManager->releaseCL, return false);
 
-	kernels["markDetectedCorners"] = clCreateKernel(clManager->m_program,
+	kernels["markDetectedCorners"] = myClCreateKernel(clManager->m_program,
 			"markDetectedCorners", &err);
 	CHECK_ERROR_OCL(err, "creating markDetectedCorners kernel",
 			clManager->releaseCL, return false);
 
-	kernels["getLineCrossing"] = clCreateKernel(clManager->m_program,
+	kernels["getLineCrossing"] = myClCreateKernel(clManager->m_program,
 			"getLineCrossing", &err);
 	CHECK_ERROR_OCL(err, "creating getLineCrossing kernel",
 			clManager->releaseCL, return false);
 
-	kernels["getColPixels"] = clCreateKernel(clManager->m_program,
+	kernels["getColPixels"] = myClCreateKernel(clManager->m_program,
 			"getColPixels", &err);
 	CHECK_ERROR_OCL(err, "creating getColPixels kernel", clManager->releaseCL,
 			return false);
 
-	kernels["getTransValidity"] = clCreateKernel(clManager->m_program,
+	kernels["getTransValidity"] = myClCreateKernel(clManager->m_program,
 			"getTransValidity", &err);
 	CHECK_ERROR_OCL(err, "creating getTransValidity kernel",
 			clManager->releaseCL, return false);
 
-	kernels["getPatternIndicator"] = clCreateKernel(clManager->m_program,
+	kernels["getPatternIndicator"] = myClCreateKernel(clManager->m_program,
 			"getPatternIndicator", &err);
 	CHECK_ERROR_OCL(err, "creating getPatternIndicator kernel",
 			clManager->releaseCL, return false);
 
-	kernels["copyInGL"] = clCreateKernel(clManager->m_program, "copyInGL",
+	kernels["copyInGL"] = myClCreateKernel(clManager->m_program, "copyInGL",
 			&err);
 	CHECK_ERROR_OCL(err, "creating copyInGL kernel", clManager->releaseCL,
 			return false);
 
-	kernels["plotCorners"] = clCreateKernel(clManager->m_program, "plotCorners",
+	kernels["plotCorners"] = myClCreateKernel(clManager->m_program, "plotCorners",
 			&err);
 	CHECK_ERROR_OCL(err, "creating plotCorners kernel", clManager->releaseCL,
 			return false);
@@ -2377,32 +2416,32 @@ bool CLTracker::initializeGPUKernels() {
 
 bool CLTracker::initializeGPUMemoryBuffers() {
 	cl_int err;
-	mems["img"] = clCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
+	mems["img"] = myClCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
 			img_size.x * img_size.y * sizeof(cl_uchar), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating img memory", clManager->releaseCL,
 			return false);
 
 	// RGB image
-	mems["imgc"] = clCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
+	mems["imgc"] = myClCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
 			img_size.x * img_size.y * sizeof(cl_uchar) * 3, NULL, &err);
 	CHECK_ERROR_OCL(err, "creating imgc memory", clManager->releaseCL,
 			return false);
 
 	// color purity
-	mems["purity"] = clCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
+	mems["purity"] = myClCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
 			(img_size.x / m_sz_blk) * (img_size.y / m_sz_blk)
 					* sizeof(cl_uchar), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating img memory", clManager->releaseCL,
 			return false);
 
 	// corner indicator
-	mems["corners"] = clCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
+	mems["corners"] = myClCreateBuffer(clManager->m_clContext, CL_MEM_READ_WRITE,
 			img_size.x * img_size.y * sizeof(cl_uchar), NULL, &err);
 	CHECK_ERROR_OCL(err, "creating corners memory", clManager->releaseCL,
 			return false);
 
 	// refined corner indicator
-	mems["cornersNew"] = clCreateBuffer(clManager->m_clContext,
+	mems["cornersNew"] = myClCreateBuffer(clManager->m_clContext,
 			CL_MEM_READ_WRITE, img_size.x * img_size.y * sizeof(cl_uchar), NULL,
 			&err);
 	CHECK_ERROR_OCL(err, "creating cornersNew memory", clManager->releaseCL,
@@ -2410,13 +2449,13 @@ bool CLTracker::initializeGPUMemoryBuffers() {
 
 	// input image
 	print_out("Creating GL memory buffer");
-	mem_images[0] = clCreateFromGLTexture2D(clManager->m_clContext,
+	mem_images[0] = myClCreateFromGLTexture2D(clManager->m_clContext,
 			CL_MEM_READ_ONLY, GL_TEXTURE_2D, 0, in_tex, &err);
 	CHECK_ERROR_OCL(err, "creating gl input texture", clManager->releaseCL,
 			return false);
 
 	// output image for display
-	mem_images[1] = clCreateFromGLTexture2D(clManager->m_clContext,
+	mem_images[1] = myClCreateFromGLTexture2D(clManager->m_clContext,
 			CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, out_tex, &err);
 	CHECK_ERROR_OCL(err, "creating gl output texture", clManager->releaseCL,
 			return false);
@@ -2425,9 +2464,9 @@ bool CLTracker::initializeGPUMemoryBuffers() {
 
 double CLTracker::getProcTime(cl_event k_proc_event, const char *str) {
 	cl_ulong time_start, time_end;
-	clGetEventProfilingInfo(k_proc_event, CL_PROFILING_COMMAND_START,
+	myClGetEventProfilingInfo(k_proc_event, CL_PROFILING_COMMAND_START,
 			sizeof(time_start), &time_start, NULL);
-	clGetEventProfilingInfo(k_proc_event, CL_PROFILING_COMMAND_END,
+	myClGetEventProfilingInfo(k_proc_event, CL_PROFILING_COMMAND_END,
 			sizeof(time_end), &time_end, NULL);
 	float t_colmap = (time_end - time_start) / 1000000.0;
 	int t_int = (int) t_colmap;

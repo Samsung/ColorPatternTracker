@@ -44,6 +44,18 @@ public class MainTrackerActivity extends Activity {
 				requestPermissions(new String[]{android.Manifest.permission.CAMERA},
 						10);
 			}
+			/*
+			hasReadPermission = checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
+				requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						10);
+			}
+			hasReadPermission = checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
+			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
+				requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+						10);
+			}
+			*/
 		}
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -69,6 +81,7 @@ public class MainTrackerActivity extends Activity {
 		mView.mRenderer.mCgTrack.mTextDetectedPatterns = (TextView) findViewById(R.id.text_detectedPatterns);
 		mView.mRenderer.mCgTrack.mTextDetectedPatterns.setTextColor(Color.rgb(0, 0, 0));
 		mView.mRenderer.mCgTrack.textViewHandler = (HandlerExtension) detectedPatternTextHandler;
+		mView.mRenderer.mShaderManager.context = getApplicationContext();
 		
 		// debug
 		setDebugButton();

@@ -72,9 +72,6 @@ public class ColorGridTracker {
     // jni
 
 	static {
-		//System.load("/vendor/lib/egl/libGLESv1_CM_adreno.so");
-		//System.load("/vendor/lib/egl/libGLESv2_adreno.so");
-		System.load("/vendor/lib/egl/libGLES_mali.so");
 		System.loadLibrary("cgt");
 	}
 
@@ -107,74 +104,9 @@ public class ColorGridTracker {
 	public static native void destroyCL();
 
 	/**
-	 * Load opencl.
-	 */
-	public void loadLibrary_opencl(){
-		java.io.File file = new java.io.File("/system/vendor/lib/libOpenCL.so");
-		if(file.exists()){
-			Log.e("TRAC","lib 1");
-			System.load("/vendor/lib/egl/libGLESv1_CM_adreno.so");
-			//System.load("/vendor/lib/egl/libGLESv2_adreno.so");
-			//System.load("/vendor/lib/egl/libGLES_mali.so");
-			//System.load("/system/vendor/lib/libOpenCL.so");
-			System.loadLibrary("cgt");
-			return;
-		}
-
-		file = new java.io.File("/system/lib/libOpenCL.so");
-		if(file.exists()){
-			Log.e("TRAC","lib 2");
-			System.load("/system/lib/libOpenCL.so");
-			System.loadLibrary("cgt");
-			return;
-		}
-
-		file = new java.io.File("/system/vendor/lib/egl/libGLES_mali.so");
-		if(file.exists()){
-			Log.e("TRAC","lib 3");
-			System.load("/system/vendor/lib/egl/libGLES_mali.so");
-			System.loadLibrary("cgt");
-			return;
-		}
-
-		file = new java.io.File("/system/lib/egl/libGLES_mali.so");
-		if(file.exists()){
-			Log.e("TRAC","lib 4");
-			System.load("/system/lib/egl/libGLES_mali.so");
-			System.loadLibrary("cgt");
-			return;
-		}
-
-		file = new java.io.File("/vendor/lib/egl/libGLESv1_CM_adreno.so");
-		if(file.exists()){
-			Log.e("TRAC","lib 5");
-			System.load("/vendor/lib/egl/libGLESv1_CM_adreno.so");
-			System.loadLibrary("cgt");
-			return;
-		}
-
-		file = new java.io.File("/vendor/lib/egl/libGLESv2_adreno.so");
-		if(file.exists()){
-			Log.e("TRAC","lib 6");
-			System.load("/vendor/lib/egl/libGLESv2_adreno.so");
-			System.loadLibrary("cgt");
-			return;
-		}
-
-		file = new java.io.File("/system/vendor/lib/libPVROCL.so");
-		if(file.exists()){
-			Log.e("TRAC","lib 7");
-			System.load("/system/vendor/lib/libPVROCL.so");
-			System.loadLibrary("cgt");
-			return;
-		}
-	}
-
-	/**
 	 * Instantiates a new color grid tracker.
 	 */
 	public ColorGridTracker(){
-		//loadLibrary_opencl();
 		initVars();
 	}
 	
