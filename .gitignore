@@ -12,7 +12,12 @@ PatternTracker/app/src/main/cpp/CL_bkup
 PatternTracker/libraries/opencv/build
 PatternTracker/libraries/opencv/javadoc
 PatternTracker/app/src/main/cpp - Copy
+PatternTracker/app/src/main/cpp-org
+PatternTracker/app/src/main/cpp/CL_mod
 PatternTracker/app/app-release.apk
 PatternTracker/app/src/main/cpp/src/CLStubTemp.h
 PatternTracker/app/src/main/cpp/src/CLStub_mod.cpp
 PatternTracker/app/src/main/cpp/src/CLStub_mod.h
+PatternTracker/app/src/main/cpp/src/CLStub.h
+PatternTracker/app/src/main/cpp/src/convertFiles.asv
+PatternTracker/app/src/main/cpp/src/convertFiles.m
