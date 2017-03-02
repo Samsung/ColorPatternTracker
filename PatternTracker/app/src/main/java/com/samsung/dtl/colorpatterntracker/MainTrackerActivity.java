@@ -41,14 +41,12 @@ public class MainTrackerActivity extends Activity {
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 			int hasReadPermission = checkSelfPermission(android.Manifest.permission.CAMERA);
 			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
-				requestPermissions(new String[]{android.Manifest.permission.CAMERA},
-						10);
+				requestPermissions(new String[]{android.Manifest.permission.CAMERA},10);
 			}
 			/*
 			hasReadPermission = checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
-				requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						10);
+				requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
 			}
 			hasReadPermission = checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE);
 			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {

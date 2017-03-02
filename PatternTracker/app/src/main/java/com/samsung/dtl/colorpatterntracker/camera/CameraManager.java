@@ -219,15 +219,20 @@ public class CameraManager {
 		
 		param.setPictureSize(camera_res.x, camera_res.y);
 		param.setPreviewSize(camera_res.x, camera_res.y);
-		param.setJpegQuality(100);
 
-        param.set("vrmode", 1);
-        param.setRecordingHint(true);
-        param.set("fast-fps-mode", 2);
-        param.setPreviewFpsRange(120000, 120000);
-        param.set("no-display-mode", "true");
-        
+		param.setJpegQuality(100);
+		param.set("vrmode", 1);
+		param.setRecordingHint(true);
 		mCamera.setParameters(param);
+
+		try {
+			param.set("fast-fps-mode", 2);
+			param.setPreviewFpsRange(120000, 120000);
+			param.set("no-display-mode", "true");
+			mCamera.setParameters(param);
+		} catch (Exception e){
+			Log.e("camera", e.getMessage());
+		}
     }
     
     /** The auto focus callback. */

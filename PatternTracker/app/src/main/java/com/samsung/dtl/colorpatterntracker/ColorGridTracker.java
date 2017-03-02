@@ -48,8 +48,8 @@ public class ColorGridTracker {
     /** The lin filter. */
     public LinearPrediction linFilter; /*!< The linear predictor. */
     
-    /** The tracked origin. */
-    private Mat trackedOrigin; /*!< The tracked origin coordinates. */
+	/** The tracked origin. */
+	private Mat trackedOrigin; /*!< The tracked origin coordinates. */
 
     /** The last capture time. */
     long lastCaptureTime; /*!< The last capture time. */
