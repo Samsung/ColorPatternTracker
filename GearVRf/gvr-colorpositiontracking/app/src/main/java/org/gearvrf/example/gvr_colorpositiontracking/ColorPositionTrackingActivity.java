@@ -1,3 +1,18 @@
+/* Copyright 2017 Samsung Electronics Co., LTD
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.gearvrf.example.gvr_colorpositiontracking;
 
 import android.app.Activity;
@@ -5,16 +20,12 @@ import android.os.Bundle;
 
 import java.io.IOException;
 
-import org.gearvrf.debug.DebugServer;
 import org.gearvrf.GVRActivity;
 import org.gearvrf.GVRCameraRig;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRMain;
 import org.gearvrf.GVRScene;
-import org.gearvrf.GVRSceneObject;
-import org.gearvrf.scene_objects.GVRTextViewSceneObject;
 import org.gearvrf.scene_objects.GVRModelSceneObject;
-import org.gearvrf.IErrorEvents;
 import org.gearvrf.animation.GVRAnimationEngine;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRRepeatMode;
@@ -39,29 +50,9 @@ public class ColorPositionTrackingActivity extends GVRActivity {
 
     private class ColorPositionTrackingMain extends GVRMain {
         public void onInit(GVRContext gvrContext) {
-        final DebugServer debug = gvrContext.startDebugServer();
+
             GVRScene scene = gvrContext.getNextMainScene();
             cameraRig = scene.getMainCameraRig();
-
-            /*
-            GVRTextViewSceneObject textview = new GVRTextViewSceneObject(gvrContext, "position tracking!");
-            textview.getTransform().setPosition(0.0f, 0.0f, -4.0f);
-            textview.setName("textview");
-            scene.addSceneObject(textview);
-            */
-
-            String telnetString = "telnet " + "localhost" + " " + DebugServer.DEFAULT_DEBUG_PORT;
-
-            android.util.Log.d(TAG, telnetString);
-
-            IErrorEvents errorHandler = new IErrorEvents()
-            {
-                public void onError(String message, Object source)
-                {
-                    debug.logError(message);
-                }
-            };
-            gvrContext.getEventReceiver().addListener(errorHandler);
 
             try {
                 // load space platform
@@ -92,16 +83,6 @@ public class ColorPositionTrackingActivity extends GVRActivity {
             } catch(IOException e) {
                 e.printStackTrace();
             } 
-            /*
-            try {
-                GVRSceneObject test = gvrContext.loadModel("testscene.fbx");
-                test.getTransform().setPosition(0.0f, 0.0f, -50.0f);
-                test.setName("test");
-                scene.addSceneObject(test);
-            } catch(IOException e) {
-                e.printStackTrace();
-            } 
-            */
 
             // done adding objects, bind shaders
             scene.bindShaders();
@@ -113,7 +94,7 @@ public class ColorPositionTrackingActivity extends GVRActivity {
             float y = btreceiver.getY();
             float z = btreceiver.getZ();
 
-            // convert from cm to m
+            // convert to meters
             x /= 10.0f;
             y /= 10.0f;
             z /= 10.0f;
