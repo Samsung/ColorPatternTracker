@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
+            url "http://google.bintray.com/googlevr"
+        }
+    }
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "org.gearvrf.example.gvr_colorpositiontracking"
+        minSdkVersion 19
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // ignore the x86 and arm-v8 files from the google vr libraries
+    packagingOptions {
+        exclude 'lib/x86/libgvr.so'
+        exclude 'lib/arm64-v8a/libgvr.so'
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'org.gearvrf:framework:3.1.1'
+    compile 'org.gearvrf:backend_daydream:3.1.1'
+    compile 'org.gearvrf:backend_oculus:3.1.1'
+    compile 'com.google.vr:sdk-base:1.10.0'
+    compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
+    //compile 'org.joml:joml-android:1.9.1-SNAPSHOT'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile 'junit:junit:4.12'
+    compile files('libs/btooth.jar')
+}
