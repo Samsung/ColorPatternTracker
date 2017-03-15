@@ -117,11 +117,11 @@ installation:
 
 1.  Install the Tracker apk \[PatternTracker.apk\] available in the "Executables" folder  on the Tracker phone.
 
-2.  Install VR apk \[TrackerGearVR.apk\] available in the "Executables" folder on a the VR phone.
+2.  Install VR apk \[TrackerGearVR.apk\] available in the "Executables" folder on a the VR phone or compile is as described [here](GearVRScene/README.md).
 
 	2.1 Alternatively, you can try the [GearVRf](https://resources.samsungdevelopers.com/Gear_VR/020_GearVR_Framework_Project/020_Get_Started) example provided [here](GearVRf/README.md).
 	
-	2.2 Or you can try the [Sketchfab](https://sketchfab.com/) example provided [here](Sketchfab\README.md)
+	2.2 Or you can try the [Sketchfab](https://sketchfab.com/) example provided [here](Sketchfab/README.md)
 
 3.  Pair Tracker phone and VR phone via bluetooth.
 
