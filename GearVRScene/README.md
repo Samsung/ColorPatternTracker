@@ -1,4 +1,4 @@
-This Unity based apk receives the XYZ coordinates from ColorPatternTracker and enables motion tracking in the rendered scene via bluetooth.
+This Unity based project at ColorPatternTracker/GearVRScene/ receives the XYZ coordinates from ColorPatternTracker and enables motion tracking in the rendered scene via bluetooth.
 
 In order to compile this VR apk, perform the following steps:
 
