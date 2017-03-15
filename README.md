@@ -220,30 +220,7 @@ It is currently tested to run on Galaxy S6 and Galaxy S7 phones. If it doesn't w
 1. "getLibNames" function in cgt.cpp file might need to be modified in order to load the correct libraries. 
 2. "ShaderManager.java" and "CameraManager.java" might need to be modified to adjust for the capabilities of the new phone.
 
-<<<<<<< HEAD
 Follow the steps described in Direct Installation section to run the system.
-=======
-If it runs and doesn't track the pattern, it may need adjustment of focal length and other internal camera parameters in the source code.
-
-In order to compile the VR apk, perform the following steps:
-
-1.  Install unity 5.3.4f1 available at [https://unity3d.com/get-unity/download](https://unity3d.com/get-unity/download).
-
-2.  Open the project and go to File>Build Settings>Player
-    Settings>Publishing settings
-
-3.  Sign the application with an Oculus Signature File that is specific to your device.  [ See this page for more details on the Oculus Signature File: https://developer3.oculus.com/documentation/mobilesdk/latest/concepts/mobile-submission-sig-file/ ]
-
-	3.1 Create an Oculus Signature file following the instructions on this webpage: https://dashboard.oculus.com/tools/osig-generator/
-
-	3.2. Place the Oculus Signature file generated in step 1 in the Unity project in the  \<UnityProject\>/Assets/Plugins/Android/assets/ directory.
-4. Build the Unity project for the Android platform.
-
-5.  Click build to create the apk.
-
-Once both the VR apk and Tracker apk are built, follow the steps
-described in Direct Installation section to run the system.
->>>>>>> origin/master
 
 By: Abhishek Nagar   
 	Samsung Electronics America, Dallas   
