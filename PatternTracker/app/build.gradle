@@ -15,8 +15,8 @@ android {
         applicationId "com.samsung.dtl.colorpatterntracker"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             ndkBuild {
@@ -28,8 +28,8 @@ android {
             // libraries Gradle should build and package with your APK.
             abiFilters 'armeabi-v7a'
         }
-        signingConfig signingConfigs.release
     }
+    signingConfig signingConfigs.release
     buildTypes {
         release {
             minifyEnabled false

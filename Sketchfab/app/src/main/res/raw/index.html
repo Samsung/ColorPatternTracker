@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<title>BT Tracked SketchFab Viewer</title>
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.0.0.js"></script>
+    <script>
+        var sf_api;
+	    var sf_rootNode;
+    </script>
+    <script src="websocket_to_sketchfab.js"></script>
+</head>
+<body>
+    <input type="text" id="inputMessage" value="Hello, Web Socket!"><button id="sendButton">Send</button>
+    <input type="text" id="logMessage" value="Logs here:">
+    <p id="logOutput"></p>
+    <div id="fullbody">
+        <!-- Insert an empty iframe for SketchFab to render into -->
+        <iframe src="" id="api-frame" width="320" height="240"
+                allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"
+                style="position:fixed; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+    </div>
+
+    <!-- Initialize the viewer -->
+    <script type="text/javascript">
+    var iframe = document.getElementById('api-frame');
+    var version = '1.0.0';
+    var urlid = '7w7pAfrCfjovwykkEeRFLGw5SXS';
+    var client = new Sketchfab(version, iframe);
+
+
+    client.init(urlid,
+        {
+            success: function onSuccess(api)
+            {
+                api.start(
+                    function()
+                    {
+                        document.getElementById('fullbody').addEventListener('btReceiveEventType',
+                            function(e)
+                            {
+                                console.log('inside clicked');
+                                var floatView = new Float32Array(e.data);
+                                var btn = document.getElementById('tempButton');
+                                btn.childNodes[0].nodeValue = "clicked";
+                                api.lookat( [ floatView[0], floatView[1], floatView[2] ], [ 0, 0, 0 ], 0 );
+                            }, false);
+                    }
+                );
+
+                api.addEventListener('viewerready',
+                    function()
+                    {
+                        // API is ready to use
+                        // Insert your code here
+                        console.log('Viewer is ready');
+
+                        sf_api = api;
+                        api.getNodeMap(
+                            function(err, nodes)
+                            {
+                                if (!err)
+                                {
+                                    for (i = 0; i < Object.keys(nodes).length; i++)
+                                    {
+                                        if (nodes[Object.keys(nodes)[i]].name)
+                                        {
+                                            if (nodes[Object.keys(nodes)[i]].name < "rootModel" ||
+                                                nodes[Object.keys(nodes)[i]].name > "rootModel")
+                                            {
+                                                // Do nothing
+                                            }
+                                            else
+                                            {
+                                                sf_rootNode = nodes[Object.keys(nodes)[i]];
+                                            }
+                                        }
+                                    }
+                                    console.log(nodes);
+                                }
+                            }
+                        );
+                    }
+                );
+            },
+            error: function onError()
+            {
+                console.log('Viewer error');
+            },
+            cardboard:1
+        }
+    );
+    </script>
+
+    <!-- button onclick="clickFunction()" id="tempButton">Click me new</button -->
+</body>
+</html>

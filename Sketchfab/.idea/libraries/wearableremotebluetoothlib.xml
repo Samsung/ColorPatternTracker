@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="wearableremotebluetoothlib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/wearableremotebluetoothlib.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

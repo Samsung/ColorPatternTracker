@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="C:\Users\m.jace\Desktop\TrackFab\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e4dfb2c7e40df1c5e5a9b924081973afcd137422">
+        <dex dex="C:\Users\m.jace\Desktop\TrackFab\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_b6932d31e2a4d9128bf4e37013e47d77dc98ac32\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\m.jace\Desktop\TrackFab\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="C:\Users\m.jace\Desktop\TrackFab\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_7055f1ea1c4b59b0d465d00ddbb65d0b9b243029\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\m.jace\Desktop\TrackFab\app\libs\java_websocket.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="35f488c2a8cb28569c1bbf69abcb1b8b04db8e01">
+        <dex dex="C:\Users\m.jace\Desktop\TrackFab\app\build\intermediates\transforms\dex\debug\folders\1000\2\java_websocket_34f79102bd043ae4431dbec0b445365f150328ab\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\m.jace\Desktop\TrackFab\app\libs\wearableremotebluetoothlib.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d3c213e247d7df95c7b28af60a3e94e565db9d5d">
+        <dex dex="C:\Users\m.jace\Desktop\TrackFab\app\build\intermediates\transforms\dex\debug\folders\1000\2\wearableremotebluetoothlib_2af0f19b046406bec1ee40e77e313be64cae71ff\classes.dex" />
+    </item>
+
+</items>
