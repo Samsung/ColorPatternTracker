@@ -1,6 +1,8 @@
 Color Pattern Tracker: User Guide
 ==========
 
+This is a computer vision based real-time pattern tracking project implemented in android using GPU via OpenCL [also available on [GooglePlay](https://play.google.com/store/apps/details?id=com.samsung.dtl.colorpatterntracker)]. Here a color grid pattern printed on a regular paper pattern is tracked using a smartphone camera to estimate its position and orientation. The estimated position is then transmitted via bluetooth to any paired device, say, a VR headset. 
+
 Virtual reality, or VR, is the newest and potentially the most efficient
 dimension of media. One of the important components of creating a
 virtual experience is simulating the vision. And for simulating vision,
@@ -213,12 +215,35 @@ To compile the project,
 4. Connect your mobile phone and press Run> Run 'app'
 
 
-It is currently expected to run on Galaxy S6 and Galaxy S7 phones. There are a few things that you can try to make it work on any arbitrary phone:
+It is currently tested to run on Galaxy S6 and Galaxy S7 phones. If it doesn't work on you phone please check if it has OpenCL 1.1 FULL PROFILE [you can check it using this [app](https://play.google.com/store/apps/details?id=com.robertwgh.opencl_z_android)]. If it has OpenCL and still doesn't work, here are a few things that you can try to make it work:
 
 1. "getLibNames" function in cgt.cpp file might need to be modified in order to load the correct libraries. 
 2. "ShaderManager.java" and "CameraManager.java" might need to be modified to adjust for the capabilities of the new phone.
 
+<<<<<<< HEAD
 Follow the steps described in Direct Installation section to run the system.
+=======
+If it runs and doesn't track the pattern, it may need adjustment of focal length and other internal camera parameters in the source code.
+
+In order to compile the VR apk, perform the following steps:
+
+1.  Install unity 5.3.4f1 available at [https://unity3d.com/get-unity/download](https://unity3d.com/get-unity/download).
+
+2.  Open the project and go to File>Build Settings>Player
+    Settings>Publishing settings
+
+3.  Sign the application with an Oculus Signature File that is specific to your device.  [ See this page for more details on the Oculus Signature File: https://developer3.oculus.com/documentation/mobilesdk/latest/concepts/mobile-submission-sig-file/ ]
+
+	3.1 Create an Oculus Signature file following the instructions on this webpage: https://dashboard.oculus.com/tools/osig-generator/
+
+	3.2. Place the Oculus Signature file generated in step 1 in the Unity project in the  \<UnityProject\>/Assets/Plugins/Android/assets/ directory.
+4. Build the Unity project for the Android platform.
+
+5.  Click build to create the apk.
+
+Once both the VR apk and Tracker apk are built, follow the steps
+described in Direct Installation section to run the system.
+>>>>>>> origin/master
 
 By: Abhishek Nagar   
 	Samsung Electronics America, Dallas   
