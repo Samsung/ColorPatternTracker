@@ -7,7 +7,6 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
 
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import android.app.Activity;
@@ -27,7 +26,8 @@ import com.samsung.dtl.bluetoothlibrary.profile.BtPosition6f;
  * The Class MyGLRenderer.
  */
 public class CustomGLRenderer implements GLSurfaceView.Renderer{
-
+	
+	
 	// tracker
 	public ColorGridTracker mCgTrack; /*!< The tracker instance. */
 	
@@ -59,9 +59,7 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	EGLContext mEglContext; /*!< The egl context instance. */
 	
 	// logging
-	private final String TAG = "cgt"; /*!< The tag. */
-
-	int nFBOs = 0;
+	private final String TAG = "cgt"; /*!< The tag. */	
     
 	/**
 	 * Instantiates a new glRenderer.
@@ -69,7 +67,6 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	 * @param view the view
 	 */
 	CustomGLRenderer (CustomGLSurfaceView view) {
-		nFBOs = 1;
 		mCameraManager = new CameraManager();
 		mShaderManager = new ShaderManager();
 		camera_res = new Point(1920, 1080);
@@ -87,9 +84,9 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceCreated(javax.microedition.khronos.opengles.GL10, javax.microedition.khronos.egl.EGLConfig)
 	 */
 	public void onSurfaceCreated (GL10 unused, EGLConfig config) {        
-		mSTexture = mShaderManager.initTex(camera_res, nFBOs);
+		mSTexture = mShaderManager.initTex(camera_res);
 		mCameraManager.initializeCamera(camera_res, mSTexture);
-		//ColorGridTracker.initCL(camera_res.x, camera_res.y, mShaderManager.glTextures_in[0], mShaderManager.glTextures_out[0]);
+		ColorGridTracker.initCL(camera_res.x, camera_res.y, mShaderManager.glTextures[0], mShaderManager.glTextures[1]);
 	}
 	
 	/* (non-Javadoc)
@@ -106,15 +103,7 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	 * @return the long
 	 */
 	public long captureFrame(){
-
-		// logic for saving certain frame buffers
-		boolean saveFiles = false;
-		saveFiles=(mCameraManager.frameNo%nFBOs==nFBOs-1);
-		if(mCameraManager.frameNo<5000000) saveFiles=false;
-		if(mCgTrack.mDebugLevel==0 && mCameraManager.frameNo%nFBOs==(nFBOs-1))saveFiles=true;
-
-		long captureTime = mShaderManager.cameraToTexture(mSTexture, camera_res,mCameraManager.frameNo%nFBOs, nFBOs,saveFiles);
-
+		long captureTime = mShaderManager.cameraToTexture(mSTexture, camera_res);
 		if(processedCaptureTime == captureTime || captureTime==0)return 0;
 		processedCaptureTime = captureTime;
 		mCameraManager.frameNo++;
@@ -131,7 +120,7 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 		if(captureTime==0)return;
 		
 		// track
-		Mat origin = Mat.zeros(0, 0, CvType.CV_32FC1);//mCgTrack.trackGrid(camera_res.y, camera_res.x,frameIdForTracker(), captureTime);
+		Mat origin = mCgTrack.trackGrid(camera_res.y, camera_res.x,frameIdForTracker(), captureTime);
 
 		// send
 		if(origin.rows()!=0 && sendBT){
@@ -143,7 +132,7 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 		mCameraManager.updateCameraParams(mCgTrack,origin, camera_res);
 		
 		// debug
-		if(mCgTrack.mDebugLevel==1)mShaderManager.renderFromTexture(mShaderManager.glTextures_in[(mCameraManager.frameNo-1+nFBOs)%nFBOs], display_dim);
+		if(mCgTrack.mDebugLevel==1)mShaderManager.renderFromTexture(mShaderManager.glTextures[1], display_dim);
 	}
 	
 	/**

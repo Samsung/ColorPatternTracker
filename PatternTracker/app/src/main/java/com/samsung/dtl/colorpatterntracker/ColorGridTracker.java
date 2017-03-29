@@ -75,6 +75,7 @@ public class ColorGridTracker {
 		System.loadLibrary("cgt");
 	}
 
+
 	/**
 	 * Initializes the cl.
 	 *
