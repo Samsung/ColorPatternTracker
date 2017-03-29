@@ -13,6 +13,7 @@ PatternTracker/libraries/opencv/build
 PatternTracker/libraries/opencv/javadoc
 PatternTracker/app/src/main/cpp - Copy
 PatternTracker/app/src/main/cpp-org
+PatternTracker/app/src/main/cpp_win
 PatternTracker/app/src/main/cpp/CL_mod
 PatternTracker/app/app-release.apk
 PatternTracker/app/src/main/cpp/src/CLStubTemp.h

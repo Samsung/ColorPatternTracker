@@ -23,8 +23,10 @@ import android.util.Log;
 public class ShaderManager {
 	
 	public int[] hTex; /*!< The texture to store camera image. */
-	public int[] glTextures; /*!< The input and output opengl textures. */
-	public IntBuffer targetFramebuffer; /*!< The target framebuffer. */
+	//public int[] glTextures; /*!< The input and output opengl textures. */
+	public int[] glTextures_in; /*!< The input opengl textures. */
+	public int[] glTextures_out; /*!< The input opengl textures. */
+	public IntBuffer[] targetFramebuffer; /*!< The target framebuffer. */
 
 	private FloatBuffer vertexCoord; /*!< The vertex coordinates. */
 	private FloatBuffer cameraTexCoord; /*!< The camera texture coordinates. */
@@ -85,7 +87,7 @@ public class ShaderManager {
 				 1.0f, 1.0f
 			};
 
-			vertexCoord = ByteBuffer.allocateDirect(12*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		vertexCoord = ByteBuffer.allocateDirect(12*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		vertexCoord.put(vertexCoordTmp);
 		vertexCoord.position(0);
 		cameraTexCoord = ByteBuffer.allocateDirect(8*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -103,10 +105,10 @@ public class ShaderManager {
 	 * @param camera_res the camera resolution
 	 * @return the capture time
 	 */
-	public long cameraToTexture(SurfaceTexture mSTexture, Point camera_res) {
+	public long cameraToTexture(SurfaceTexture mSTexture, Point camera_res, int frameBufferID, int nFBOs, boolean saveFiles) {
 		long captureTime=0;
 		int error0 = GLES20.glGetError();
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, targetFramebuffer.get(0));
+		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, targetFramebuffer[frameBufferID].get(0));
 		int error1 = GLES20.glGetError();
 		int fbret = GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER);
 		int error2 = GLES20.glGetError();
@@ -147,41 +149,42 @@ public class ShaderManager {
 		int error12 = GLES20.glGetError();
 		GLES20.glFinish();
 
+		if(saveFiles) {
+			for (int i = 0; i < nFBOs; i++) {
+				GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, targetFramebuffer[i].get(0));
+				ByteBuffer byteBuffer = ByteBuffer.allocate(1920 * 1080 * 4);
+				byteBuffer.order(ByteOrder.nativeOrder());
 
-		/*
-		{
-			ByteBuffer byteBuffer = ByteBuffer.allocate(1920 * 1080 * 4);
-			byteBuffer.order(ByteOrder.nativeOrder());
+				GLES20.glReadPixels(0, 0, 1920, 1080, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuffer);
+				int error14 = GLES20.glGetError();
+				byte[] array = byteBuffer.array();
 
-			GLES20.glReadPixels(0, 0, 1920, 1080, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuffer);
-			int error14 = GLES20.glGetError();
-			byte[] array = byteBuffer.array();
-
-			java.io.FileOutputStream outputStream = null;
-			try {
-				String diskstate = Environment.getExternalStorageState();
-				if(diskstate.equals("mounted")){
-					java.io.File picFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-					java.io.File picFile = new java.io.File(picFolder,"imgc.bin");
-					outputStream = new java.io.FileOutputStream(picFile);
+				java.io.FileOutputStream outputStream = null;
+				try {
+					String diskstate = Environment.getExternalStorageState();
+					if (diskstate.equals("mounted")) {
+						java.io.File picFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+						java.io.File picFile = new java.io.File(picFolder, "imgc" + i + ".bin");
+						outputStream = new java.io.FileOutputStream(picFile);
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
 				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
 
-			try {
-				outputStream.write(array);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+				try {
+					outputStream.write(array);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		*/
+
 		return captureTime;
 	}
 	
@@ -219,9 +222,10 @@ public class ShaderManager {
 	 * @param camera_res the camera resolution
 	 * @return the surface texture
 	 */
-	public SurfaceTexture initTex(Point camera_res) {
+	public SurfaceTexture initTex(Point camera_res, int nFBOs) {
 		hTex = new int[1];
-		glTextures = new int[2];
+		int [] glTextures_temp = new int[1];
+
 		int error = GLES20.glGetError();
 		GLES20.glGenTextures ( 1, hTex, 0 );error = GLES20.glGetError();
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, hTex[0]);error = GLES20.glGetError();
@@ -230,26 +234,50 @@ public class ShaderManager {
 		//GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);error = GLES20.glGetError();
 		//GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);error = GLES20.glGetError();
 		//GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);error = GLES20.glGetError();
+		glTextures_in = new int[nFBOs];
+		glTextures_out = new int[1];
+		for(int i=0;i<nFBOs;i++) {
+			GLES20.glGenTextures(1, glTextures_temp, 0);
+			glTextures_in[i] = glTextures_temp[0];
 
-		GLES20.glGenTextures ( 2, glTextures, 0 );error = GLES20.glGetError();
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures[0]);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR_MIPMAP_NEAREST);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);error = GLES20.glGetError();
-		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, camera_res.x, camera_res.y, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);error = GLES20.glGetError();
-		GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);error = GLES20.glGetError();
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);error = GLES20.glGetError();
+			error = GLES20.glGetError();
+			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures_in[i]);
+			error = GLES20.glGetError();
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_NEAREST);
+			error = GLES20.glGetError();
+			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+			error = GLES20.glGetError();
+			GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, camera_res.x, camera_res.y, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+			error = GLES20.glGetError();
+			GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+			error = GLES20.glGetError();
+			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+			error = GLES20.glGetError();
+		}
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures_out[0]);
+		error = GLES20.glGetError();
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+		error = GLES20.glGetError();
+		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+		error = GLES20.glGetError();
+		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, camera_res.x, camera_res.y, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+		error = GLES20.glGetError();
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+		error = GLES20.glGetError();
 
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures[1]);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);error = GLES20.glGetError();
-		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, camera_res.x, camera_res.y, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);error = GLES20.glGetError();
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);error = GLES20.glGetError();
-		
-		targetFramebuffer = IntBuffer.allocate(1);error = GLES20.glGetError();
-		GLES20.glGenFramebuffers(1, targetFramebuffer);error = GLES20.glGetError();
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, targetFramebuffer.get(0));error = GLES20.glGetError();
-		GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, glTextures[0], 0);error = GLES20.glGetError();
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);error = GLES20.glGetError();
+		targetFramebuffer = new IntBuffer[nFBOs];
+		for(int i=0;i<nFBOs;i++) {
+			targetFramebuffer[i] = IntBuffer.allocate(1);
+			error = GLES20.glGetError();
+			GLES20.glGenFramebuffers(1, targetFramebuffer[i]);
+			error = GLES20.glGetError();
+			GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, targetFramebuffer[i].get(0));
+			error = GLES20.glGetError();
+			GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, glTextures_in[i], 0);
+			error = GLES20.glGetError();
+			GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+			error = GLES20.glGetError();
+		}
 		
 		GLES20.glClearColor (1.0f, 1.0f, 0.0f, 1.0f);error = GLES20.glGetError();
 		hProgram = loadShader(vss, camera_fss);error = GLES20.glGetError();
