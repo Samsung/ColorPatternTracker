@@ -1838,6 +1838,12 @@ void CLTracker::validateCorners(std::vector<int> &id_pts, float *xCorners,
 	//get distances from center
 	std::vector<float> dist(9);
 	std::vector<float> dist_const(9);
+	if (id_pts[4] == -1) {
+		for (int i = 1; i < 9; i++) {
+				id_pts[i] = -1;
+		}
+		return;
+	}
 	float xm = xCorners[id_pts[4]];
 	float ym = yCorners[id_pts[4]];
 	for (int i = 0; i < 9; i++) {
