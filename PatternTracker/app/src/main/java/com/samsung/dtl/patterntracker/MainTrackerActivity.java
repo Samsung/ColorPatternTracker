@@ -16,6 +16,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import android.content.pm.PackageManager;
+import android.os.Build;
+
 /**
  * The Class MainTrackerActivity.
  */
@@ -36,6 +39,14 @@ public class MainTrackerActivity extends Activity {
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+			int hasReadPermission = checkSelfPermission(android.Manifest.permission.CAMERA);
+			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
+				requestPermissions(new String[]{android.Manifest.permission.CAMERA},
+						10);
+			}
+
+		}
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		detectedPatternTextHandler = new HandlerExtension(this);
