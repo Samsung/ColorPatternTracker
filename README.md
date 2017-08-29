@@ -1,6 +1,6 @@
 [New: 
 1. A further optimized C++ code for the tracker is provided in Tracker_openmp folder. 
-2. OpenCL started working with latest Android Studio updates!]
+2. Use of OpenCL on Android is still unstable see https://developer.android.com/about/versions/nougat/android-7.0-changes.html#ndk]
 
 
 Color Pattern Tracker: User Guide
