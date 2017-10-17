@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import javax.microedition.khronos.opengles.GL10;
+
 /**
  * The Class MainTrackerActivity.
  */
@@ -38,6 +40,9 @@ public class MainTrackerActivity extends Activity {
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+
+
+
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 			int hasReadPermission = checkSelfPermission(android.Manifest.permission.CAMERA);
 			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {

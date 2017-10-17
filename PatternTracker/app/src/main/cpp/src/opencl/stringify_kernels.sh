@@ -1,10 +1,10 @@
 #!/bin/bash
 
-kernels="cgTracker"
+kernels="colConversion getPurity"
 
 for name in $kernels
 do
-    IN=$name.cl
+    IN=$name.cs
     OUT=$name.h
 
     #if [ $IN -ot $OUT ]

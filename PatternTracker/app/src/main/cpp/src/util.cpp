@@ -1,9 +1,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <iostream>
 #include <exception>
 #include <stdexcept>
+
+#include <time.h>
 
 #include "util.h"
 
@@ -20,6 +21,13 @@ void print_out(const char *fmt, ...) {
 
 	free(msg);
 	va_end(args);
+}
+
+long currentTimeInNanos() {
+
+	struct timespec res;
+	clock_gettime(CLOCK_MONOTONIC, &res);
+	return (res.tv_sec * NANOS_IN_SECOND) + res.tv_nsec;
 }
 
 }

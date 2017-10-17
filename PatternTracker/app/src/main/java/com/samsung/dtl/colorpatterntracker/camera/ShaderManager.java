@@ -12,9 +12,11 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
-import android.opengl.GLES20;
+import android.opengl.GLES31;
 import android.os.Environment;
 import android.util.Log;
+
+import javax.microedition.khronos.opengles.GL10;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -105,47 +107,47 @@ public class ShaderManager {
 	 */
 	public long cameraToTexture(SurfaceTexture mSTexture, Point camera_res) {
 		long captureTime=0;
-		int error0 = GLES20.glGetError();
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, targetFramebuffer.get(0));
-		int error1 = GLES20.glGetError();
-		int fbret = GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER);
-		int error2 = GLES20.glGetError();
-		if (fbret != GLES20.GL_FRAMEBUFFER_COMPLETE) {
+		int error0 = GLES31.glGetError();
+		GLES31.glBindFramebuffer(GLES31.GL_FRAMEBUFFER, targetFramebuffer.get(0));
+		int error1 = GLES31.glGetError();
+		int fbret = GLES31.glCheckFramebufferStatus(GLES31.GL_FRAMEBUFFER);
+		int error2 = GLES31.glGetError();
+		if (fbret != GLES31.GL_FRAMEBUFFER_COMPLETE) {
 		  Log.d("", "unable to bind fbo" + fbret);
 		}
-		GLES20.glViewport(0, 0, camera_res.x, camera_res.y);
-		int error3 = GLES20.glGetError();
+		GLES31.glViewport(0, 0, camera_res.x, camera_res.y);
+		int error3 = GLES31.glGetError();
 		synchronized(this) {
 			mSTexture.updateTexImage();
 			captureTime=mSTexture.getTimestamp();
 		}
 
-		GLES20.glUseProgram(hProgram);
-		int error4 = GLES20.glGetError();
+		GLES31.glUseProgram(hProgram);
+		int error4 = GLES31.glGetError();
 
-		int ph = GLES20.glGetAttribLocation(hProgram, "vPosition");
-		int tch = GLES20.glGetAttribLocation (hProgram, "vTexCoord");
-		int th = GLES20.glGetUniformLocation (hProgram, "sTexture");
+		int ph = GLES31.glGetAttribLocation(hProgram, "vPosition");
+		int tch = GLES31.glGetAttribLocation (hProgram, "vTexCoord");
+		int th = GLES31.glGetUniformLocation (hProgram, "sTexture");
 
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		int error5 = GLES20.glGetError();
-		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, hTex[0]);
-		int error6 = GLES20.glGetError();
-		GLES20.glUniform1i(th, 0);
-		int error7 = GLES20.glGetError();
+		GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
+		int error5 = GLES31.glGetError();
+		GLES31.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, hTex[0]);
+		int error6 = GLES31.glGetError();
+		GLES31.glUniform1i(th, 0);
+		int error7 = GLES31.glGetError();
 
-		GLES20.glVertexAttribPointer(ph, 2, GLES20.GL_FLOAT, false, 4*3, vertexCoord);
-		int error8 = GLES20.glGetError();
-		GLES20.glVertexAttribPointer(tch, 2, GLES20.GL_FLOAT, false, 4*2, cameraTexCoord);
-		int error9 = GLES20.glGetError();
-		GLES20.glEnableVertexAttribArray(ph);
-		int error10 = GLES20.glGetError();
-		GLES20.glEnableVertexAttribArray(tch);
-		int error11 = GLES20.glGetError();
+		GLES31.glVertexAttribPointer(ph, 2, GLES31.GL_FLOAT, false, 4*3, vertexCoord);
+		int error8 = GLES31.glGetError();
+		GLES31.glVertexAttribPointer(tch, 2, GLES31.GL_FLOAT, false, 4*2, cameraTexCoord);
+		int error9 = GLES31.glGetError();
+		GLES31.glEnableVertexAttribArray(ph);
+		int error10 = GLES31.glGetError();
+		GLES31.glEnableVertexAttribArray(tch);
+		int error11 = GLES31.glGetError();
 
-		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-		int error12 = GLES20.glGetError();
-		GLES20.glFinish();
+		GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, 4);
+		int error12 = GLES31.glGetError();
+		GLES31.glFinish();
 
 
 		/*
@@ -153,8 +155,8 @@ public class ShaderManager {
 			ByteBuffer byteBuffer = ByteBuffer.allocate(1920 * 1080 * 4);
 			byteBuffer.order(ByteOrder.nativeOrder());
 
-			GLES20.glReadPixels(0, 0, 1920, 1080, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuffer);
-			int error14 = GLES20.glGetError();
+			GLES31.glReadPixels(0, 0, 1920, 1080, GLES31.GL_RGBA, GLES31.GL_UNSIGNED_BYTE, byteBuffer);
+			int error14 = GLES31.glGetError();
 			byte[] array = byteBuffer.array();
 
 			java.io.FileOutputStream outputStream = null;
@@ -192,25 +194,25 @@ public class ShaderManager {
 	 * @param display_dim the display dimension
 	 */
 	public void renderFromTexture(int displayTexture, Point display_dim) {
-		GLES20.glViewport(0, 0, display_dim.x, display_dim.y);
+		GLES31.glViewport(0, 0, display_dim.x, display_dim.y);
 
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-		GLES20.glUseProgram(displayTextureProgram);
+		GLES31.glBindFramebuffer(GLES31.GL_FRAMEBUFFER, 0);
+		GLES31.glUseProgram(displayTextureProgram);
 
-		int ph = GLES20.glGetAttribLocation(displayTextureProgram, "vPosition");
-		int tch = GLES20.glGetAttribLocation(displayTextureProgram, "vTexCoord");
-		int th = GLES20.glGetUniformLocation(displayTextureProgram, "sTexture");
+		int ph = GLES31.glGetAttribLocation(displayTextureProgram, "vPosition");
+		int tch = GLES31.glGetAttribLocation(displayTextureProgram, "vTexCoord");
+		int th = GLES31.glGetUniformLocation(displayTextureProgram, "sTexture");
 
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, displayTexture);
-		GLES20.glUniform1i(th, 0);
+		GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
+		GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, displayTexture);
+		GLES31.glUniform1i(th, 0);
 
-		GLES20.glVertexAttribPointer(ph, 2, GLES20.GL_FLOAT, false, 4*3, vertexCoord);
-		GLES20.glVertexAttribPointer(tch, 2, GLES20.GL_FLOAT, true, 4*2, openclTexCoord);
-		GLES20.glEnableVertexAttribArray(ph);
-		GLES20.glEnableVertexAttribArray(tch);
-		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-		GLES20.glFinish();
+		GLES31.glVertexAttribPointer(ph, 2, GLES31.GL_FLOAT, false, 4*3, vertexCoord);
+		GLES31.glVertexAttribPointer(tch, 2, GLES31.GL_FLOAT, true, 4*2, openclTexCoord);
+		GLES31.glEnableVertexAttribArray(ph);
+		GLES31.glEnableVertexAttribArray(tch);
+		GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, 4);
+		GLES31.glFinish();
 	}
 
 	/**
@@ -222,40 +224,51 @@ public class ShaderManager {
 	public SurfaceTexture initTex(Point camera_res) {
 		hTex = new int[1];
 		glTextures = new int[2];
-		int error = GLES20.glGetError();
-		GLES20.glGenTextures ( 1, hTex, 0 );error = GLES20.glGetError();
-		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, hTex[0]);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);error = GLES20.glGetError();
-		//GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);error = GLES20.glGetError();
-		//GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);error = GLES20.glGetError();
-		//GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);error = GLES20.glGetError();
+		int error = GLES31.glGetError();
+		GLES31.glGenTextures ( 1, hTex, 0 );error = GLES31.glGetError();
+		GLES31.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, hTex[0]);error = GLES31.glGetError();
+		GLES31.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES31.GL_TEXTURE_WRAP_S, GLES31.GL_CLAMP_TO_EDGE);error = GLES31.glGetError();
+		GLES31.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES31.GL_TEXTURE_WRAP_T, GLES31.GL_CLAMP_TO_EDGE);error = GLES31.glGetError();
+		//GLES31.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES31.GL_TEXTURE_MIN_FILTER, GLES31.GL_LINEAR_MIPMAP_LINEAR);error = GLES31.glGetError();
+		//GLES31.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES31.GL_TEXTURE_MIN_FILTER, GLES31.GL_LINEAR);error = GLES31.glGetError();
+		//GLES31.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES31.GL_TEXTURE_MAG_FILTER, GLES31.GL_LINEAR);error = GLES31.glGetError();
 
-		GLES20.glGenTextures ( 2, glTextures, 0 );error = GLES20.glGetError();
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures[0]);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR_MIPMAP_NEAREST);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);error = GLES20.glGetError();
-		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, camera_res.x, camera_res.y, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);error = GLES20.glGetError();
-		GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);error = GLES20.glGetError();
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);error = GLES20.glGetError();
+		GLES31.glGenTextures ( 2, glTextures, 0 );error = GLES31.glGetError();
 
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures[1]);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);error = GLES20.glGetError();
-		GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);error = GLES20.glGetError();
-		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, camera_res.x, camera_res.y, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);error = GLES20.glGetError();
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);error = GLES20.glGetError();
+		GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, glTextures[0]);error = GLES31.glGetError();
+		GLES31.glTexParameteri(GLES31.GL_TEXTURE_2D,GLES31.GL_TEXTURE_MIN_FILTER,GLES31.GL_LINEAR_MIPMAP_NEAREST);error = GLES31.glGetError();
+		GLES31.glTexParameteri(GLES31.GL_TEXTURE_2D,GLES31.GL_TEXTURE_MAG_FILTER,GLES31.GL_LINEAR);error = GLES31.glGetError();
+		//GLES31.glTexImage2D(GLES31.GL_TEXTURE_2D, 0, GLES31.GL_RGBA, camera_res.x, camera_res.y, 0, GLES31.GL_RGBA, GLES31.GL_UNSIGNED_BYTE, null);error = GLES31.glGetError();
+		GLES31.glTexStorage2D(GLES31.GL_TEXTURE_2D, 1, GLES31.GL_RGBA8, camera_res.x, camera_res.y);error = GLES31.glGetError();
+		GLES31.glGenerateMipmap(GLES31.GL_TEXTURE_2D);error = GLES31.glGetError();
+		GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, 0);error = GLES31.glGetError();
+		//GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
+		//GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, glTextures[0]);error = GLES31.glGetError();
+		GLES31.glBindImageTexture(0, glTextures[0], 0,true,0,GLES31.GL_READ_ONLY,GLES31.GL_RGBA8);
+		error = GLES31.glGetError();
+
+		GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, glTextures[1]);error = GLES31.glGetError();
+		GLES31.glTexParameteri(GLES31.GL_TEXTURE_2D,GLES31.GL_TEXTURE_MIN_FILTER,GLES31.GL_LINEAR);error = GLES31.glGetError();
+		GLES31.glTexParameteri(GLES31.GL_TEXTURE_2D,GLES31.GL_TEXTURE_MAG_FILTER,GLES31.GL_LINEAR);error = GLES31.glGetError();
+		//GLES31.glTexImage2D(GLES31.GL_TEXTURE_2D, 0, GLES31.GL_RGBA, camera_res.x, camera_res.y, 0, GLES31.GL_RGBA, GLES31.GL_UNSIGNED_BYTE, null);error = GLES31.glGetError();
+		GLES31.glTexStorage2D(GLES31.GL_TEXTURE_2D, 1, GLES31.GL_RGBA8, camera_res.x, camera_res.y);error = GLES31.glGetError();
+		GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, 0);error = GLES31.glGetError();
+		//GLES31.glActiveTexture(GLES31.GL_TEXTURE1);
+		//GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, glTextures[1]);error = GLES31.glGetError();
+		GLES31.glBindImageTexture(1, glTextures[1], 0, true,0,GLES31.GL_WRITE_ONLY,GLES31.GL_RGBA8);
+		error = GLES31.glGetError();
+
+		targetFramebuffer = IntBuffer.allocate(1);error = GLES31.glGetError();
+		GLES31.glGenFramebuffers(1, targetFramebuffer);error = GLES31.glGetError();
+		GLES31.glBindFramebuffer(GLES31.GL_FRAMEBUFFER, targetFramebuffer.get(0));error = GLES31.glGetError();
+		GLES31.glFramebufferTexture2D(GLES31.GL_FRAMEBUFFER, GLES31.GL_COLOR_ATTACHMENT0, GLES31.GL_TEXTURE_2D, glTextures[0], 0);error = GLES31.glGetError();
+		GLES31.glBindFramebuffer(GLES31.GL_FRAMEBUFFER, 0);error = GLES31.glGetError();
 		
-		targetFramebuffer = IntBuffer.allocate(1);error = GLES20.glGetError();
-		GLES20.glGenFramebuffers(1, targetFramebuffer);error = GLES20.glGetError();
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, targetFramebuffer.get(0));error = GLES20.glGetError();
-		GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, glTextures[0], 0);error = GLES20.glGetError();
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);error = GLES20.glGetError();
+		GLES31.glClearColor (1.0f, 1.0f, 0.0f, 1.0f);error = GLES31.glGetError();
+		hProgram = loadShader(vss, camera_fss);error = GLES31.glGetError();
+		displayTextureProgram = loadShader(vss, texture_fss);error = GLES31.glGetError();
 		
-		GLES20.glClearColor (1.0f, 1.0f, 0.0f, 1.0f);error = GLES20.glGetError();
-		hProgram = loadShader(vss, camera_fss);error = GLES20.glGetError();
-		displayTextureProgram = loadShader(vss, texture_fss);error = GLES20.glGetError();
-		
-		SurfaceTexture mSTexture = new SurfaceTexture (hTex[0]);error = GLES20.glGetError();
+		SurfaceTexture mSTexture = new SurfaceTexture (hTex[0]);error = GLES31.glGetError();
 		return mSTexture;
 	}
 
@@ -267,33 +280,33 @@ public class ShaderManager {
 	 * @return the program ID
 	 */
 	private static int loadShader ( String vertex_shader, String fragment_shader ) {
-		int vshader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-		GLES20.glShaderSource(vshader, vertex_shader);
-		GLES20.glCompileShader(vshader);
+		int vshader = GLES31.glCreateShader(GLES31.GL_VERTEX_SHADER);
+		GLES31.glShaderSource(vshader, vertex_shader);
+		GLES31.glCompileShader(vshader);
 		int[] compiled = new int[1];
-		GLES20.glGetShaderiv(vshader, GLES20.GL_COMPILE_STATUS, compiled, 0);
+		GLES31.glGetShaderiv(vshader, GLES31.GL_COMPILE_STATUS, compiled, 0);
 		if (compiled[0] == 0) {
 			Log.e("Shader", "Could not compile vshader");
-			Log.v("Shader", "Could not compile vshader:"+GLES20.glGetShaderInfoLog(vshader));
-			GLES20.glDeleteShader(vshader);
+			Log.v("Shader", "Could not compile vshader:"+GLES31.glGetShaderInfoLog(vshader));
+			GLES31.glDeleteShader(vshader);
 			vshader = 0;
 		}
 
-		int fshader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-		GLES20.glShaderSource(fshader, fragment_shader);
-		GLES20.glCompileShader(fshader);
-		GLES20.glGetShaderiv(fshader, GLES20.GL_COMPILE_STATUS, compiled, 0);
+		int fshader = GLES31.glCreateShader(GLES31.GL_FRAGMENT_SHADER);
+		GLES31.glShaderSource(fshader, fragment_shader);
+		GLES31.glCompileShader(fshader);
+		GLES31.glGetShaderiv(fshader, GLES31.GL_COMPILE_STATUS, compiled, 0);
 		if (compiled[0] == 0) {
 			Log.e("Shader", "Could not compile fshader");
-			Log.v("Shader", "Could not compile fshader:"+GLES20.glGetShaderInfoLog(fshader));
-			GLES20.glDeleteShader(fshader);
+			Log.v("Shader", "Could not compile fshader:"+GLES31.glGetShaderInfoLog(fshader));
+			GLES31.glDeleteShader(fshader);
 			fshader = 0;
 		}
 
-		int program = GLES20.glCreateProgram();
-		GLES20.glAttachShader(program, vshader);
-		GLES20.glAttachShader(program, fshader);
-		GLES20.glLinkProgram(program);
+		int program = GLES31.glCreateProgram();
+		GLES31.glAttachShader(program, vshader);
+		GLES31.glAttachShader(program, fshader);
+		GLES31.glLinkProgram(program);
 			 
 		return program;
 	}
@@ -302,6 +315,6 @@ public class ShaderManager {
 	 * Deletes textures.
 	 */
 	public void deleteTex() {
-		GLES20.glDeleteTextures (1, hTex, 0);
+		GLES31.glDeleteTextures (1, hTex, 0);
 	}
 }

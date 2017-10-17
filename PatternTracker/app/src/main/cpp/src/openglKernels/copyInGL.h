@@ -1,0 +1,17 @@
+static const char *copyInGL_kernel =
+"#version 310 es\n"
+"\n"
+"#extension GL_ANDROID_extension_pack_es31a : require\n"
+"layout(local_size_x = 4, local_size_y = 2) in;\n"
+"layout(binding=0, rgba32f) uniform mediump readonly image2D input_image;\n"
+"layout(binding=1, rgba32f) uniform mediump writeonly image2D output_image;\n"
+"void main()\n"
+"{\n"
+"	ivec2 pos;\n"
+"\t\t\n"
+"\t\tpos.x = int(gl_GlobalInvocationID.x);\n"
+"\t\tpos.y = int(gl_GlobalInvocationID.y);\n"
+"	\n"
+"	vec4 pixelf = imageLoad(input_image, pos);\n"
+"	imageStore(output_image, pos, pixelf);\n"
+"}\n";

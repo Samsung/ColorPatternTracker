@@ -1856,7 +1856,6 @@ for (int idy = 0; idy < (int)floor(h / sz_blk); idy++) {
 					
 					float gr;
 
-
 					if (pixelf.x >= pixelf.y && pixelf.y >= pixelf.z) {
 						gr = pixelf.x;
 						if (gr < th)continue;

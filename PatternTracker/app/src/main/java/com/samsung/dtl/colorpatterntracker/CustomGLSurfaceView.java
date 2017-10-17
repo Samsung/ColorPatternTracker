@@ -24,7 +24,7 @@ public class CustomGLSurfaceView extends GLSurfaceView {
 	public CustomGLSurfaceView(Context context, AttributeSet attrs) {
 	   super(context, attrs);
 		mRenderer = new CustomGLRenderer(this);
-		setEGLContextClientVersion (2);
+		setEGLContextClientVersion (3);
 		setRenderer(mRenderer);
 		setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 	}

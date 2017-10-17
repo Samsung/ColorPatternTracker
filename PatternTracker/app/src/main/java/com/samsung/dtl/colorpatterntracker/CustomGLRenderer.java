@@ -10,6 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 import org.opencv.core.Mat;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
@@ -26,8 +27,7 @@ import com.samsung.dtl.bluetoothlibrary.profile.BtPosition6f;
  * The Class MyGLRenderer.
  */
 public class CustomGLRenderer implements GLSurfaceView.Renderer{
-	
-	
+
 	// tracker
 	public ColorGridTracker mCgTrack; /*!< The tracker instance. */
 	
@@ -132,7 +132,9 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 		mCameraManager.updateCameraParams(mCgTrack,origin, camera_res);
 		
 		// debug
-		if(mCgTrack.mDebugLevel==1)mShaderManager.renderFromTexture(mShaderManager.glTextures[1], display_dim);
+		if(mCgTrack.mDebugLevel==1){
+			mShaderManager.renderFromTexture(mShaderManager.glTextures[1], display_dim);
+		}
 	}
 	
 	/**

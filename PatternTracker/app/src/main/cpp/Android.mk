@@ -10,13 +10,10 @@ SRC_PATH := src
 LOCAL_CFLAGS    += -I$(SRC_PATH) -g -Wno-deprecated-declarations
 LOCAL_CFLAGS    += -DSHOW_REFERENCE_PROGRESS=1
 LOCAL_MODULE    := cgt
-LOCAL_SRC_FILES := cgt.cpp \
-	$(SRC_PATH)/util.cpp \
-	$(SRC_PATH)/CLManager.cpp \
-    $(SRC_PATH)/CLTracker.cpp
+LOCAL_SRC_FILES := cgt.cpp src/GLManager.cpp src/util.cpp
 
-LOCAL_LDLIBS := -landroid -llog -ljnigraphics -ldl
-LOCAL_STATIC_LIBRARIES := android_native_app_glue
+LOCAL_LDLIBS := -landroid -llog -ljnigraphics -ldl -lGLESv3 -lEGL
+#LOCAL_STATIC_LIBRARIES := android_native_app_glue
 
 include $(BUILD_SHARED_LIBRARY)
-$(call import-module,android/native_app_glue)
+#$(call import-module,android/native_app_glue)
