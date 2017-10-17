@@ -1796,7 +1796,7 @@ namespace JNICLTracker{
 
 bool GLManager::colorConversion(cl_kernel &knl_colConversion, cl_mem &memobj_in,
                                 int w_img, int h_img, bool saveOutput, const char *fname) {
-
+    // comment:
     int n_pixels = img_size.x * img_size.y;
     int err;
         // color conversion kernel
