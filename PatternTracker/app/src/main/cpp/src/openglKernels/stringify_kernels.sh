@@ -1,6 +1,6 @@
 #!/bin/bash
 
-kernels="colConversion getColorPurity copyInGL getTransValidity getLineCrossing getPatternIndicator plotCorners markDetectedCorners cornersZero getBlockCorners refineCorners getNCorners getCorners getLinePtAssignment"
+kernels="colConversion getColorPurity copyInGL getTransValidity getLineCrossing getPatternIndicator plotCornersInput plotCorners markDetectedCorners markDetectedCornersInput cornersZero getBlockCorners refineCorners getNCorners getCorners getLinePtAssignment"
 OUT_MAIN=computeShaderKernels.h
 echo " " >$OUT_MAIN
 

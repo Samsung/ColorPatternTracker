@@ -13,26 +13,71 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
+
             <Button
                 android:id="@+id/button_debug"
-                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Debug: On" />
+                android:text="Debug: Off" />
 
             <Button
                 android:id="@+id/button_updateGeom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Update Geom: Off" />
+
+            <Button
+                android:id="@+id/button_wb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mod WB" />
+
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <SeekBar
+                android:id="@+id/seekbar_exposure"
+                android:layout_width="189dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/button_exposure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="ModExp: off" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_focus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="ModFocus: on" />
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/text_detectedPatterns"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Detected patterns" />
+
     </LinearLayout>
 </FrameLayout>

@@ -8,22 +8,16 @@
 
 #include<dlfcn.h>
 
-#include <EGL/egl.h> // requires ndk >= r5
-
-#include <GLES3/gl3ext.h>
-#include <GLES3/gl31.h>
-
 #include "src/openglKernels/computeShaderKernels.h"
 
+#include "glIncludes.h"
+#include "cl_gl_interop.h"
 #include "util.h"
+#include "patternUtil.h"
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
-
-#define cl_kernel GLuint
-#define cl_mem GLuint
-#define cl_uchar unsigned char
 
 namespace JNICLTracker{
 
@@ -80,30 +74,27 @@ public:
                       bool trackMultiPatter);
 
     // init params
-    void setParamsCenterToCorner(int mLocRecFromCornerData[][7]);
-    bool setCornerRefinementParameters();
-    void getCrossIds(int crossIds[]);
+    //void setParamsCenterToCorner(int mLocRecFromCornerData[][7]);
+    //bool setCornerRefinementParameters();
+    //void getCrossIds(int crossIds[]);
 
     // kernels
     bool copyColor();
     bool getRefinedCorners(cv::Mat &locMat, cv::Mat &frameMetadataF,
                                       cv::Mat &frameMetadataI, int frameNo, bool checkTrans, int debug,
                                       bool trackMultiPattern);
-    bool getRefinedCornersForPattern(cv::Mat &locMat,
-                                                cv::Mat &frameMetadataF, cv::Mat &frameMetadataI, int frameNo,
-                                                bool checkTrans, int patId_prev, int debug);
-    void getCentersFromCorners(cv::Mat &mLocations, cv::Mat &locMat,
-                                          int mLocRecFromCornerData[][7]);
+    bool getRefinedCornersForPattern(cv::Mat &locMat, float &intensity, int &patID, bool checkTrans, int patId_prev, int debug, int frameNo);
+    //bool getRefinedCornersForPattern(cv::Mat &locMat, cv::Mat &frameMetadataF, cv::Mat &frameMetadataI, int frameNo, bool checkTrans, int patId_prev, int debug);
+
+    //void getCentersFromCorners(cv::Mat &mLocations, cv::Mat &locMat, int mLocRecFromCornerData[][7]);
     bool getValidTrans(cv::Mat &mLocations, cv::Mat &locMat,
                                   cl_mem &mem_16Pts);
-    void getCornersFromCrossPts(cv::Mat &locMat, float crossPts[]);
-    float getReprojectionAndErrorForPattern(cv::Mat &locMat, float err_max,
-                                                       bool isComplete);
-    bool getPatternIdAndIntensity(cv::Mat &locMat, cv::Mat &frameMetadataI,
-                                             cv::Mat &frameMetadataF, int patId_prev, int debug);
+    //void getCornersFromCrossPts(cv::Mat &locMat, float crossPts[]);
+    //float getReprojectionAndErrorForPattern(cv::Mat &locMat, float err_max,bool isComplete);
 
-    void getPatternIdAndIntensityFromGrayVals(float indicator[],
-                                                         cv::Mat &frameMetadataI, cv::Mat &frameMetadataF, int patId_prev);
+    //bool getPatternIdAndIntensity(cv::Mat &locMat, cv::Mat &frameMetadataI, cv::Mat &frameMetadataF, int patId_prev, int debug);
+    bool getPatternIdAndIntensity(cv::Mat &locMat, int &patID, float &intensity, int patId_prev, int debug);
+
     bool colorConversion(cl_kernel &knl_colConversion, cl_mem &memobj_in,
                                     int w_img, int h_img, bool saveOutput, const char *fname);
     bool getColorPurity(cl_kernel &knl_purity, cl_mem &memobj_purity,
@@ -124,28 +115,16 @@ public:
                                      cv::Mat &frameMetadataF, cv::Mat &frameMetadataI,
                                      bool trackMultiPattern, int frameNo, int debug, bool saveOutput,
                                      const char *fname);
-    void validateCorners(std::vector<int> &id_pts, float *xCorners,
-                                    float *yCorners);
+    //void validateCorners(std::vector<int> &id_pts, float *xCorners, float *yCorners);
 
-    cv::Mat getBoundingQuad(cv::Mat &locMat_this);
-    bool isInsideQuad(cv::Mat &quad, float x, float y);
+    //cv::Mat getBoundingQuad(cv::Mat &locMat_this);
+    //bool isInsideQuad(cv::Mat &quad, float x, float y);
 
     void findNewPattern(float *ptPurity, int *ptClass, int &count_patterns,
                                    cv::Mat &locMat, int nCorners, int Pow2[], uchar valid_ptSel[],
                                    float *xCorners, float *yCorners, int frameNo, int debug,
                                    cv::Mat &frameMetadataF, cv::Mat &frameMetadataI);
-    struct CornerRefinementParam{
-        int mLocRecFromCornerData[16][7];
-        int crossIDs[48];
-        float crossPts[48];
-        float colVals[48];
-        cl_mem mem_crossIds;
-        cl_mem mem_16Pts;
-        cl_mem mem_crossPts;
-        cl_mem mem_col16Pts;
-        cv::Mat ptsTM;
-        cv::Mat ptsTM_homo;
-    };
+
     CornerRefinementParam cornerParams;
 
     std::map<std::string, cl_mem> mems;

@@ -1,7 +1,7 @@
 #version 310 es
 
 #extension GL_ANDROID_extension_pack_es31a : require
-layout(local_size_x = 4, local_size_y = 2) in;
+layout(local_size_x = 128, local_size_y = 1) in;
 layout(binding=0, rgba32f) uniform mediump readonly image2D input_image;
 layout(std430, binding = 2) buffer transValidity_ssbo {int validity[];};
 layout(std430, binding = 3) buffer data_ssbo {float data[];};
@@ -9,28 +9,20 @@ layout(std430, binding = 4) buffer inVals_ssbo {float inVals[];};
 void main()
 {
 	float x_mid, y_mid, angle, d_w, d_h;
+	int n_check, nx_check, ny_check, nt_check;
 	x_mid = inVals[0];
 	y_mid = inVals[1];
 	angle = inVals[2];
 	d_w = inVals[3];
 	d_h = inVals[4];
+	n_check = int(floor(inVals[5]));
+	nx_check = int(floor(inVals[6]));
+	ny_check = int(floor(inVals[7]));
+	nt_check = int(floor(inVals[8]));
 	
-    int id1 = int(float(gl_GlobalInvocationID.x));
-    int id2 = int(float(gl_GlobalInvocationID.y));
-		    
-    //int id = id1*18+id2;
-    //if(id>=405)return;
-    int id = id1*8+id2;
-    if(id>=125)return;
-    
-    //int nx_check = 4;
-    //int ny_check = 4;
-    //int nt_check = 2;
-    
-    int nx_check = 2;
-    int ny_check = 2;
-    int nt_check = 2;
-    
+    int id = int(float(gl_GlobalInvocationID.x));
+    if(id>=n_check)return;
+        
     float dxt = (floor(float(id)/float((2*ny_check+1)*(2*nt_check+1)))-float(nx_check));
     int id_temp = id%((2*ny_check+1)*(2*nt_check+1));
     float dyt = (floor(float(id_temp)/float(2*nt_check+1))-float(ny_check));

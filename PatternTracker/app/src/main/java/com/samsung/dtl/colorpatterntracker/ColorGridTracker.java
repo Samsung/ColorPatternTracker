@@ -59,7 +59,18 @@ public class ColorGridTracker {
     
     /** The m update rel transf. */
     public boolean mUpdateRelTransf; /*!< The update relative transformation. */
-      
+
+	/** The update white balance button. */
+	public boolean mUpdateWB; /*!< The update white balance. */
+
+	/** The update exposure button. */
+	public boolean mUpdateExposure; /*!< The update exposure. */
+
+	public boolean mUpdateFocus;
+
+	public int mExposureSeekbarProgress;
+	public int mFocusSeekbarProgress;
+
     /** The m debug level. */
     public int mDebugLevel; /*!< The debug level. */    
     
@@ -166,7 +177,10 @@ public class ColorGridTracker {
 		mNPatterns = 6;
 		mCamModelParams = new CameraModelParams(mNPatterns);
 		mUpdateRelTransf=false;
-		
+		mUpdateWB = false;
+		mUpdateExposure = false;
+		mUpdateFocus = false;
+
 		// corners
 		initializeCorners();
 		initializeTemplateCorners();
@@ -180,7 +194,7 @@ public class ColorGridTracker {
 		lastCaptureTime=0;
 		
 		// debug
-		mDebugLevel=1;		
+		mDebugLevel=0;
 	}
 	
 	/**

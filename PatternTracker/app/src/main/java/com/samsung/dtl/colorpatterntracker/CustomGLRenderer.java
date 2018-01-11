@@ -14,12 +14,19 @@ import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
+import android.os.Environment;
 import android.util.Log;
 
 import com.samsung.dtl.colorpatterntracker.camera.CameraManager;
 import com.samsung.dtl.colorpatterntracker.camera.ShaderManager;
 import com.samsung.dtl.bluetoothlibrary.profile.BtPosition6f;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 
 // TODO: Auto-generated Javadoc
@@ -129,12 +136,108 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 		}
 		
 		// update
+		if(mCameraManager.allowWBUpdate && origin.rows()!=0){
+			getColorPixelDiff();
+		}
 		mCameraManager.updateCameraParams(mCgTrack,origin, camera_res);
 		
 		// debug
 		if(mCgTrack.mDebugLevel==1){
 			mShaderManager.renderFromTexture(mShaderManager.glTextures[1], display_dim);
+		}else{
+			mShaderManager.renderFromTexture(mShaderManager.glTextures[0], display_dim);
 		}
+	}
+
+	private int getColorPixelDiff(){
+		GLES31.glBindFramebuffer(GLES31.GL_FRAMEBUFFER, mShaderManager.targetFramebuffer.get(0));
+
+		ByteBuffer byteBuffer1 = ByteBuffer.allocate(4);
+		byteBuffer1.order(ByteOrder.nativeOrder());
+
+		int[][] order={{0,1,4,3},{1,2,5,4},{4,5,8,7},{3,4,7,6}};
+
+		double[] x = new double[4];
+		double[] y = new double[4];
+
+		int [][] colors = new int[4][3];
+		int count_valid=0;
+		for(int i=0;i<4;i++) {
+			x[i] = 0;
+			y[i]=0;
+			for(int j=0;j<4;j++) {
+				x[i] += mCgTrack.mCorners.get(order[i][j], 0)[0];
+				y[i] += mCgTrack.mCorners.get(order[i][j], 1)[0];
+			}
+			x[i] /=4;
+			y[i] /=4;
+
+			int xi,yi;
+			xi = (int)Math.round(x[i]);
+			yi = (int)Math.round(y[i]);
+
+			if(xi>=0 && xi<1080 && yi>=0 && yi<1920) {
+				GLES31.glReadPixels(yi, xi, 1, 1, GLES31.GL_RGBA, GLES31.GL_UNSIGNED_BYTE, byteBuffer1);
+				byte[] array = byteBuffer1.array();
+				//Log.e("cgt","DiffVals camPix:"+i+"["+byteToUnsignedInt(array[0])+","+byteToUnsignedInt(array[1])+","+byteToUnsignedInt(array[2])+","+byteToUnsignedInt(array[3])+"]"+xi+","+yi);
+				colors[i][0] =  byteToUnsignedInt(array[0]);
+				colors[i][1] =  byteToUnsignedInt(array[1]);
+				colors[i][2] =  byteToUnsignedInt(array[2]);
+				count_valid++;
+			}
+		}
+
+		int colDiff=0;
+		if(count_valid==4){
+			colDiff += 255-colors[0][0]+colors[0][1]+colors[0][2];
+			colDiff += colors[1][0]+255-colors[1][1]+colors[1][2];
+			colDiff += colors[2][0]+colors[2][1]+255-colors[2][2];
+			colDiff += colors[3][0]+255-colors[3][1]+colors[3][2];
+			mCameraManager.colorPixelDiff = colDiff;
+		}else{
+			mCameraManager.colorPixelDiff = -1;
+		}
+
+
+		/*
+		{
+			ByteBuffer byteBuffer = ByteBuffer.allocate(1920 * 1080 * 4);
+			byteBuffer.order(ByteOrder.nativeOrder());
+
+			GLES31.glReadPixels(0, 0, 1920, 1080, GLES31.GL_RGBA, GLES31.GL_UNSIGNED_BYTE, byteBuffer);
+			int error14 = GLES31.glGetError();
+			byte[] array = byteBuffer.array();
+
+			java.io.FileOutputStream outputStream = null;
+			try {
+				String diskstate = Environment.getExternalStorageState();
+				if(diskstate.equals("mounted")){
+					java.io.File picFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+					java.io.File picFile = new java.io.File(picFolder,"imgc.bin");
+					outputStream = new java.io.FileOutputStream(picFile);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				outputStream.write(array);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				outputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+*/
+		return 0;
+	}
+
+	public int byteToUnsignedInt(byte b) {
+		return 0x00 << 24 | b & 0xff;
 	}
 	
 	/**

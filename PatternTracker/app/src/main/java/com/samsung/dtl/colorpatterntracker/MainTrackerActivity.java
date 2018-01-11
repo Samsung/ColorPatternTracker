@@ -14,9 +14,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -32,6 +35,16 @@ public class MainTrackerActivity extends Activity {
     Button button_debug; /*!< The debug button. */
     
     Button button_updateGeom; /*!< The update geometry button. */
+
+	Button button_wb; /*!< The update white balance button. */
+
+	Button button_exposure; /*!< The update exposure button. */
+
+	Button button_focus; /*!< The update focus button. */
+
+	SeekBar seekbar_exposure;
+
+	SeekBar seekbar_focus;
     
     Handler detectedPatternTextHandler; /*!< The text handler to show learned patterns. */
         
@@ -41,14 +54,12 @@ public class MainTrackerActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
-
-
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 			int hasReadPermission = checkSelfPermission(android.Manifest.permission.CAMERA);
 			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
 				requestPermissions(new String[]{android.Manifest.permission.CAMERA},10);
 			}
-			/*
+
 			hasReadPermission = checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
 				requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
@@ -58,7 +69,6 @@ public class MainTrackerActivity extends Activity {
 				requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
 						10);
 			}
-			*/
 		}
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -91,6 +101,14 @@ public class MainTrackerActivity extends Activity {
 	    
 	    // update geometry
 	    setUpdateGeometryButton();
+
+	    // update White Balance
+		setModifyWBButton();
+
+		// update exposure
+		setModifyExposureButton();
+
+		setModifyFocusButton();
 	}
 	
 	/**
@@ -128,7 +146,83 @@ public class MainTrackerActivity extends Activity {
             }
         });		
 	}
-	
+
+	/**
+	 * Sets the White balance button.
+	 */
+	private void setModifyWBButton(){
+		button_wb = (Button) findViewById(R.id.button_wb);
+		button_wb.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				if(mView.mRenderer.mCameraManager.allowWBUpdate){
+					//mView.mRenderer.mCameraManager.allowWBUpdate=false;
+					//button_wb.setText("Mod WB: Off");
+				}else{
+					mView.mRenderer.mCameraManager.allowWBUpdate=true;
+					button_wb.setText("Mod WB");
+				}
+			}
+		});
+		mView.mRenderer.mCameraManager.button_wb = button_wb;
+	}
+
+	private void setModifyExposureButton(){
+		button_exposure = (Button) findViewById(R.id.button_exposure);
+		button_exposure.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				if(mView.mRenderer.mCameraManager.allowExposureUpdate){
+					mView.mRenderer.mCameraManager.allowExposureUpdate=false;
+					button_exposure.setText("Mod Exp: Off");
+				}else{
+					mView.mRenderer.mCameraManager.allowExposureUpdate=true;
+					button_exposure.setText("Mod Exp: On");
+				}
+			}
+		});
+
+		seekbar_exposure = (SeekBar) findViewById(R.id.seekbar_exposure);
+		seekbar_exposure.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+				Log.e("cam","progress changed to "+progress);
+				// TODO Auto-generated method stub
+				if(mView.mRenderer.mCameraManager.allowExposureUpdate){
+					mView.mRenderer.mCameraManager.mExposureSeekbarProgress = progress;
+				}else{
+					if(seekbar_exposure.getProgress() != mView.mRenderer.mCameraManager.mExposureSeekbarProgress ){
+						seekbar_exposure.setProgress(mView.mRenderer.mCameraManager.mExposureSeekbarProgress );
+					}
+				}
+			}
+		});
+	}
+
+	private void setModifyFocusButton(){
+		button_focus = (Button) findViewById(R.id.button_focus);
+		button_focus.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				if(mView.mRenderer.mCameraManager.allowFocusUpdate){
+					mView.mRenderer.mCameraManager.allowFocusUpdate=false;
+
+					button_focus.setText("Mod Focus: Off");
+				}else{
+					mView.mRenderer.mCameraManager.allowFocusUpdate=true;
+					button_focus.setText("Mod Focus: On");
+				}
+			}
+		});
+	}
+
 	/**
 	 * Update text.
 	 *

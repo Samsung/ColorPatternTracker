@@ -2,7 +2,7 @@ static const char *getLineCrossing_kernel =
 "#version 310 es\n"
 "\n"
 "#extension GL_ANDROID_extension_pack_es31a : require\n"
-"layout(local_size_x = 4, local_size_y = 1) in;\n"
+"layout(local_size_x = 1, local_size_y = 1) in;\n"
 "layout(binding=0, rgba32f) uniform mediump readonly image2D input_image;\n"
 "layout(std430, binding = 2) buffer loc_ssbo {float loc[];};\n"
 "layout(std430, binding = 3) buffer endPtIds_ssbo {int endPtIds[];};\n"

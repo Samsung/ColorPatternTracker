@@ -2,7 +2,7 @@ static const char *getBlockCorners_kernel =
 "#version 310 es\n"
 "\n"
 "#extension GL_ANDROID_extension_pack_es31a : require\n"
-"layout(local_size_x = 4, local_size_y = 2) in;\n"
+"layout(local_size_x = 128, local_size_y = 8) in;\n"
 "layout(std430, binding = 2) buffer D_ssbo {int D[];};\n"
 "layout(std430, binding = 3) buffer C_ssbo {int C[];};\n"
 "layout(std430, binding = 4) buffer purity_ssbo {int purity[];};\n"

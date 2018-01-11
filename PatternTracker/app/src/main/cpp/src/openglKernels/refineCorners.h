@@ -2,7 +2,7 @@ static const char *refineCorners_kernel =
 "#version 310 es\n"
 "\n"
 "#extension GL_ANDROID_extension_pack_es31a : require\n"
-"layout(local_size_x = 4, local_size_y = 2) in;\n"
+"layout(local_size_x = 128, local_size_y = 8) in;\n"
 "layout(binding=1, rgba32f) uniform mediump writeonly image2D output_image;\n"
 "layout(std430, binding = 2) buffer C_ssbo {int C[];};\n"
 "layout(std430, binding = 3) buffer CNew_ssbo {int CNew[];};\n"

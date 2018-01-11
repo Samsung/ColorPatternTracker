@@ -1,7 +1,7 @@
 #version 310 es
 
 #extension GL_ANDROID_extension_pack_es31a : require
-layout(local_size_x = 4, local_size_y = 2) in;
+layout(local_size_x = 128, local_size_y = 8) in;
 layout(std430, binding = 2) buffer D_ssbo {int D[];};
 layout(std430, binding = 3) buffer C_ssbo {int C[];};
 layout(std430, binding = 4) buffer purity_ssbo {int purity[];};

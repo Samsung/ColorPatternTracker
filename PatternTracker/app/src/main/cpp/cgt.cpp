@@ -41,7 +41,7 @@ JNIEXPORT void JNICALL Java_com_samsung_dtl_colorpatterntracker_ColorGridTracker
     //tracker->cleanupOpenCL();
 }
 
-    void tryComputeShader() {
+void tryComputeShader() {
         int i;
         printOpenGLStats();
         // Initialize our compute program

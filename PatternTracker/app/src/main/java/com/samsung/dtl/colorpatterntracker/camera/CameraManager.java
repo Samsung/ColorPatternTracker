@@ -1,12 +1,15 @@
 package com.samsung.dtl.colorpatterntracker.camera;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.opencv.core.Mat;
 
 import com.samsung.dtl.colorpatterntracker.ColorGridTracker;
+import com.samsung.dtl.colorpatterntracker.R;
 
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -14,17 +17,28 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.util.Log;
+import android.widget.Button;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class CameraManager.
  */
 public class CameraManager {
-	
-	
+
 	public Camera mCamera; /*!<  The camera. */
 	public int frameNo; /*!<  The frame number. */
 	public int lastTrackedFrameNo; /*!<  The last tracked frame number.. */
+	public boolean allowFocusUpdate;
+	public boolean allowExposureUpdate;
+	public boolean allowWBUpdate;
+	public int mMaxExposure, mMinExposure, mExposureSeekbarProgress;
+	public int colorPixelDiff; /*!<  Difference of pattern pixel values from the required values */
+	public List<String> supportedWBList;
+	public int [][] colorPixelDiffAll;
+	public int nColorPixelDiffVals;
+	public int nWBCaptureDone;
+	public Button button_wb;
+
 	private float mFocusZ; /*!<  The z component of the last tracked frame for focus setting. */
 	private int patternBoundingBoxLeft,patternBoundingBoxTop,patternBoundingBoxRight,patternBoundingBoxBottom; /*!<  The pattern bounding box coordinates. */
 	private int mExposureChangeDir; /*!<  Exposure change direction indicating increase or decrease in exposure. 1:increasing -1:decreasing. */
@@ -40,9 +54,18 @@ public class CameraManager {
 	public void initializeCamera(Point camera_res, SurfaceTexture mSTexture){
 		frameNo = 0;
 		lastTrackedFrameNo = 0;
+		allowFocusUpdate = true;
+		allowExposureUpdate = false;
+		mExposureSeekbarProgress = 0;
+		colorPixelDiff = -1;
+		nColorPixelDiffVals = 10;
+		allowWBUpdate = false;
+		nWBCaptureDone = 0;
 		
 		mFocusZ=-1;
 		mExposureChangeDir=1;
+
+		//doWhiteBalance = true;
 		
 		mCamera = Camera.open();
 		initCameraParametersForVideo(camera_res);
@@ -50,7 +73,18 @@ public class CameraManager {
 		try {
 			mCamera.setPreviewTexture(mSTexture);
 		} catch ( IOException ioe ) {}
-		
+
+		Camera.Parameters param;
+		param = mCamera.getParameters();
+		mMaxExposure = param.getMaxExposureCompensation();
+		mMinExposure = param.getMinExposureCompensation();
+		int exposureVal = param.getExposureCompensation();
+		mExposureSeekbarProgress = (int)Math.round((exposureVal-mMinExposure)/(double)(mMaxExposure-mMinExposure)*100);
+
+		supportedWBList = param.getSupportedWhiteBalance();
+
+		colorPixelDiffAll = new int[supportedWBList.size()][nColorPixelDiffVals];
+
 		Log.d(TAG, "Camera Resolution: " + mCamera.getParameters().getPictureSize().width + "x" + mCamera.getParameters().getPictureSize().height);
 	}
 	
@@ -64,15 +98,79 @@ public class CameraManager {
 	public void updateCameraParams(ColorGridTracker mCgTrack, Mat origin, Point camera_res){
 		if(origin.rows()!=0){ // pattern detected
 			lastTrackedFrameNo=frameNo;
-			updateFocus(mCgTrack, origin, camera_res);
-			refineExposure(mCgTrack);
+			if(allowFocusUpdate) {
+				updateFocus(mCgTrack, origin, camera_res);
+			}
+			//refineExposure(mCgTrack);
+			if(allowWBUpdate){
+				updateWhiteBalance();
+			}
 		}else{
 			if(frameNo-lastTrackedFrameNo>10){ // long time since anything tracked
-				scanExposure();
+				//scanExposure();
 			}
 		}
+		if(allowExposureUpdate) {
+			setSeekbarBasedExposure();
+			//refineExposure(mCgTrack);
+		}
 	}
-	    
+
+	private void updateWhiteBalance(){
+		if(colorPixelDiff==-1)return;
+		Camera.Parameters param = mCamera.getParameters();
+
+		int id_WB = nWBCaptureDone/nColorPixelDiffVals;
+		int nWBCapturePerSetting =nWBCaptureDone%nColorPixelDiffVals;
+		if(nWBCapturePerSetting==0){
+			param.setWhiteBalance(supportedWBList.get(id_WB));
+			colorPixelDiffAll[id_WB][nWBCapturePerSetting] = 0;
+		}else{
+			colorPixelDiffAll[id_WB][nWBCapturePerSetting] = colorPixelDiff;
+			Log.e("cgt", "DiffVals "+colorPixelDiff);
+		}
+		nWBCaptureDone++;
+
+		if(nWBCaptureDone==supportedWBList.size()*nColorPixelDiffVals){
+
+			int [] diffVals = new int[nColorPixelDiffVals];
+
+			int val_min=1000000;
+			int id_min=-1;
+			for(int i=0;i<supportedWBList.size();i++){
+				if(supportedWBList.get(i).equals(param.WHITE_BALANCE_CLOUDY_DAYLIGHT) || supportedWBList.get(i).equals(param.WHITE_BALANCE_DAYLIGHT) || supportedWBList.get(i).equals(param.WHITE_BALANCE_FLUORESCENT) || supportedWBList.get(i).equals(param.WHITE_BALANCE_INCANDESCENT) || supportedWBList.get(i).equals(param.WHITE_BALANCE_SHADE) || supportedWBList.get(i).equals(param.WHITE_BALANCE_TWILIGHT) || supportedWBList.get(i).equals(param.WHITE_BALANCE_WARM_FLUORESCENT)) {
+
+					for (int j = 0; j < nColorPixelDiffVals; j++) {
+						diffVals[j] = colorPixelDiffAll[i][j];
+					}
+					Arrays.sort(diffVals);
+					int val = diffVals[nColorPixelDiffVals / 2];
+					//Log.e("cgt", "DiffVals" + supportedWBList.get(i) + ":[" +val +","+ colorPixelDiffAll[i][0] + "," + colorPixelDiffAll[i][1] + "," + colorPixelDiffAll[i][2] + "," + colorPixelDiffAll[i][3] + "," + colorPixelDiffAll[i][4] + "," + colorPixelDiffAll[i][5] + "," + colorPixelDiffAll[i][6] + "," + colorPixelDiffAll[i][7] + "," + colorPixelDiffAll[i][8] + "," + colorPixelDiffAll[i][9]+"]");
+					if (val < val_min) {
+						val_min = val;
+						id_min = i;
+					}
+				}
+			}
+			param.setWhiteBalance(supportedWBList.get(id_min));
+			//Log.e("cgt", "DiffVals selected" + supportedWBList.get(id_min));
+			allowWBUpdate=false;
+			nWBCaptureDone=0;
+			//button_wb.setText("Mod WB: Off");
+
+		}
+		mCamera.setParameters(param);
+	}
+
+	private void setSeekbarBasedExposure(){
+		Camera.Parameters param = mCamera.getParameters();
+		int exposure = (int)Math.round(mExposureSeekbarProgress/(double)100*(mMaxExposure-mMinExposure)+mMinExposure);
+
+		param.setExposureCompensation(exposure);
+
+		mCamera.setParameters(param);
+	}
+
     /**
      * Do focus based on pattern bounding box.
      */

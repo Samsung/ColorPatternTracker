@@ -1,7 +1,7 @@
 #version 310 es
 
 #extension GL_ANDROID_extension_pack_es31a : require
-layout(local_size_x = 4, local_size_y = 2) in;
+layout(local_size_x = 64, local_size_y = 8) in;
 layout(binding=0, rgba32f) uniform mediump readonly image2D input_image;
 layout(binding=1, rgba32f) uniform mediump writeonly image2D output_image;
 layout(std430, binding = 2) buffer D_ssbo {int D[];};
@@ -21,7 +21,6 @@ void main()
     int id = pos.y*sz_x + pos.x;
     
 	vec4 pixelf = imageLoad(input_image, pos);
-    //pixelf = read_imagef(input_image, sampler, pos);
     
     float cr=pixelf.x;
     float cg=pixelf.y;
@@ -29,10 +28,10 @@ void main()
 
     //if (id >= N) return;
 
-    if ( (cr + cg + cb) < 0.5){ // 0.78
+    if ( (cr + cg + cb) < 0.05){ // 0.78
         D[id] = 0; 
-		//vec4 pixelfo = vec4(0.0f,0.0f,0.0f,1.0f);
-		//imageStore(output_image, pos, pixelfo);
+		vec4 pixelfo = vec4(0.0f,0.0f,0.0f,1.0f);
+		imageStore(output_image, pos, pixelfo);
     }
     else{
         if (cr > cg){
