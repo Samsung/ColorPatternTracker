@@ -183,11 +183,14 @@ Tracker phone with “update geometry" feature off.
 
 **Instructions for adjusting image brightness:**
 
-1. If the image is too dark or bright, image brightness can be adjusted by clicking the "ModExp: off" button. After clicking, it will turn to "ModExp: on".
+1. If the image is too dark or bright, image brightness can be adjusted by clicking the "ModExp: off" button. After clicking, it will turn to "ModExp: on". See the figure for new user interface below.
 
 2. Slide the slidebar to desired position.
 
 3. Click the "ModExp: on" button to change it to "ModExp: off".
+
+<img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/NewUI.jpg" alt="New UI" width="800px" height="440px"> 
+New user interface with additional controls.
 
 **Instructions for adjusting white balance:**
 
