@@ -233,7 +233,7 @@ namespace JNICLTracker{
             glFinish();
 
 
-            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, mem_9Pts);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, mem_9Pts);
         if (debug > 0) {
             glUseProgram(kernels["markDetectedCorners"]);
         }else{
