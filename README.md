@@ -143,9 +143,7 @@ installation:
 
 7.  Start the app on the VR phone and put it in GearVR.
 
-8.  Optionally, register the multiple patterns. See details below.
-
-9. Wear GearVR and try to move back and forth, and left and right to
+8.  Wear GearVR and try to move back and forth, and left and right to
     notice that your view in VR is adjusting according to your motion.
 
 
@@ -155,9 +153,11 @@ Tracker phone with “update geometry" feature on.
 <img src="https://raw.githubusercontent.com/Samsung/ColorPatternTracker/master/Documents/images/updateGeomOff.jpg" alt="update geometry off" width="800px" height="440px">     
 Tracker phone with “update geometry" feature off.
 
-Following are the instructions for registering multiple patterns:
+**Instructions for registering multiple patterns:**
 
-1.  Click the “Update Geom: off" button so that it show “Update Geom:
+0. Paste multiple patterns on the VR Phone. 
+
+1. Click the “Update Geom: off" button so that it show “Update Geom:
     on"
 
 2.  Place the camera of the Tracker phone so that the Pattern 0 and one
@@ -181,7 +181,23 @@ Following are the instructions for registering multiple patterns:
     that either Pattern 0 and Pattern 2 are in view or Pattern 1 and
     Pattern 2 are in view and then follow steps 2 through 3.
 
-Pattern printing instructions on windows machine:
+**Instructions for adjusting image brightness:**
+
+1. If the image is too dark or bright, image brightness can be adjusted by clicking the "ModExp: off" button. After clicking, it will turn to "ModExp: on".
+
+2. Slide the slidebar to desired position.
+
+3. Click the "ModExp: on" button to change it to "ModExp: off".
+
+**Instructions for adjusting white balance:**
+
+1. Once the app is running and the "pattern 0" is getting tracked, press the "Mod WB" button while keeping the pattern in view. You should see the screen start changing color.
+
+2. Wait for about 10-15 seconds while keeping the pattern in view till there is no change in screen color.
+
+3. White balance adjust is complete. Use the phone as desired.
+
+**Instructions for printing pattern on windows machine:**
 
 1.  Open a pattern image among those available at PatternDesign\patterns in windows photo viewer;
 
