@@ -1,6 +1,6 @@
-[New: 
-1. A further optimized C++ code for the tracker is provided in Tracker_openmp folder. 
-2. Use of OpenCL on Android is still unstable see https://developer.android.com/about/versions/nougat/android-7.0-changes.html#ndk]
+News: 
+1. The source code now uses OpenGl Compute Shader instead of OpenCL and thus works on most mobile phones.
+2. A further optimized C++ code for the tracker is provided in Tracker_openmp folder. 
 
 
 Color Pattern Tracker: User Guide
@@ -133,12 +133,10 @@ installation:
 4.  Print the six patterns shown in the figure above as described
     in “Pattern printing instructions" below
 
-5.  Attach the Pattern 0 on the front side of VR headset and any number
-    of the remaining patterns on other parts of the VR headset. See
-    figure above.
+5.  Attach the Pattern 0 on the front side of VR headset. Attach additional patterns only if you plan to register multiple      patterns. See figure above.
 
 6.  Start the PatternTracker.apk on Tracker phone. Place this phone
-    horizontally so that the “Debug:on" button is on top left corner and
+    horizontally so that the “Debug:off" button is on top left corner and
     the back-facing camera facing towards the user. See Figure
     above. Place it appropriately so that the
     GearVR is comfortably in the field of view.
@@ -147,11 +145,7 @@ installation:
 
 8.  Optionally, register the multiple patterns. See details below.
 
-9.  Optionally, click the “Debug:on" button to turn it to “Debug:off"
-    which will enhance the performance of the system but will stop
-    showing the corner indicator.
-
-10. Wear GearVR and try to move back and forth, and left and right to
+9. Wear GearVR and try to move back and forth, and left and right to
     notice that your view in VR is adjusting according to your motion.
 
 
@@ -222,10 +216,7 @@ To compile the project,
 4. Connect your mobile phone and press Run> Run 'app'
 
 
-It is currently tested to run on Galaxy S6 and Galaxy S7 phones. If it doesn't work on you phone please check if it has OpenCL 1.1 FULL PROFILE [you can check it using this [app](https://play.google.com/store/apps/details?id=com.robertwgh.opencl_z_android)]. If it has OpenCL and still doesn't work, here are a few things that you can try to make it work:
-
-1. "getLibNames" function in cgt.cpp file might need to be modified in order to load the correct libraries. 
-2. "ShaderManager.java" and "CameraManager.java" might need to be modified to adjust for the capabilities of the new phone.
+It is currently tested to run on Galaxy S6 and Galaxy S7 phones.
 
 Follow the steps described in Direct Installation section to run the system.
 
