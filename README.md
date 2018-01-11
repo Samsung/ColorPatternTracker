@@ -1,6 +1,7 @@
 News: 
 1. The source code now uses OpenGl Compute Shader instead of OpenCL and thus works on most mobile phones.
 2. A further optimized C++ code for the tracker is provided in Tracker_openmp folder. 
+3. Works only on Galaxy S7.
 
 
 Color Pattern Tracker: User Guide
@@ -100,7 +101,7 @@ the simplest way to run the system using the provided .apk files.
 Following are the minimum set of items required to operate the proposed
 system:
 
-1.  Tracker phone: Galaxy S6
+1.  Tracker phone: Galaxy S7
 
 2.  VR headset: GearVR with a smartphone (VR phone)
 
@@ -235,7 +236,7 @@ To compile the project,
 4. Connect your mobile phone and press Run> Run 'app'
 
 
-It is currently tested to run on Galaxy S6 and Galaxy S7 phones.
+It is currently tested to run on Galaxy S7 phones.
 
 Follow the steps described in Direct Installation section to run the system.
 
