@@ -1,7 +1,6 @@
 News: 
-1. The source code now uses OpenGl Compute Shader instead of OpenCL and thus works on most mobile phones.
+1. The source code now uses OpenGl Compute Shader instead of OpenCL and thus works reliably on Galaxy S7. [Tested only on Galaxy S7.]
 2. A further optimized C++ code for the tracker is provided in Tracker_openmp folder. 
-3. Works only on Galaxy S7.
 
 
 Color Pattern Tracker: User Guide
