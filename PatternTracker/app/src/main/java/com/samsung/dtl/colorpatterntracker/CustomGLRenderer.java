@@ -7,6 +7,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
 
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import android.app.Activity;
@@ -19,6 +20,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Environment;
 import android.util.Log;
 
+import com.samsung.dtl.bluetoothlibrary.profile.BTReceiverClass6;
 import com.samsung.dtl.colorpatterntracker.camera.CameraManager;
 import com.samsung.dtl.colorpatterntracker.camera.ShaderManager;
 import com.samsung.dtl.bluetoothlibrary.profile.BtPosition6f;
@@ -39,9 +41,13 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	public ColorGridTracker mCgTrack; /*!< The tracker instance. */
 	
 	// bluetooth
-	private BtPosition6f mPositionComm; /*!< The bluetooth class that communicates the position of pattern's origin. */
+	private BtPosition6f mPositionComm = null; /*!< The bluetooth class that communicates the position of pattern's origin. */
+	public BTReceiverClass6 mPositionRecv = null;
 	public boolean data_sent=false; /*!< is data_sent. */
-	private final boolean sendBT = true; /*!< allow data to be sent via bluetooth. */
+	public boolean sendBT = false; /*!< allow data to be sent via bluetooth. */
+	public boolean recvBT = true;
+	public int count_BTSend = -1;
+	public int wait_time=7;
 	
 	// timing
 	public long processedCaptureTime; /*!< The time when last frame's capture is processed. */
@@ -67,6 +73,7 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	
 	// logging
 	private final String TAG = "cgt"; /*!< The tag. */	
+	int nFBOs = 0;
     
 	/**
 	 * Instantiates a new glRenderer.
@@ -74,6 +81,11 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	 * @param view the view
 	 */
 	CustomGLRenderer (CustomGLSurfaceView view) {
+		nFBOs = 1;
+		count_BTSend = -1;
+		data_sent = false;
+
+		wait_time = 7;
 		mCameraManager = new CameraManager();
 		mShaderManager = new ShaderManager();
 		camera_res = new Point(1920, 1080);
@@ -83,17 +95,19 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 		mCgTrack = new ColorGridTracker();
 		
 		mShaderManager.initializeCoords();
-		
-		data_sent = false;
+
+
+		mPositionComm = null;
+		mPositionRecv =null;
 	}
 
 	/* (non-Javadoc)
 	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceCreated(javax.microedition.khronos.opengles.GL10, javax.microedition.khronos.egl.EGLConfig)
 	 */
 	public void onSurfaceCreated (GL10 unused, EGLConfig config) {        
-		mSTexture = mShaderManager.initTex(camera_res);
+		mSTexture = mShaderManager.initTex(camera_res, nFBOs);
 		mCameraManager.initializeCamera(camera_res, mSTexture);
-		ColorGridTracker.initCL(camera_res.x, camera_res.y, mShaderManager.glTextures[0], mShaderManager.glTextures[1]);
+		//ColorGridTracker.initCL(camera_res.x, camera_res.y, mShaderManager.glTextures[0], mShaderManager.glTextures[1]);
 	}
 	
 	/* (non-Javadoc)
@@ -110,9 +124,14 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	 * @return the long
 	 */
 	public long captureFrame(){
-		long captureTime = mShaderManager.cameraToTexture(mSTexture, camera_res);
-		if(processedCaptureTime == captureTime || captureTime==0)return 0;
-		processedCaptureTime = captureTime;
+		long captureTime=0;
+		boolean saveFiles = false;
+		if(count_BTSend==nFBOs)saveFiles=true;
+		if(count_BTSend!=-1 && count_BTSend!=0) {
+			captureTime = mShaderManager.cameraToTexture(mSTexture, camera_res, count_BTSend-1, nFBOs, saveFiles);
+		}
+		//if(processedCaptureTime == captureTime || captureTime==0)return 0;
+		//processedCaptureTime = captureTime;
 		mCameraManager.frameNo++;
 		measureFPS();		
 		return captureTime;
@@ -123,12 +142,56 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	 */
 	public void onDrawFrame ( GL10 unused ) {
 		// capture
-		long captureTime = captureFrame();
-		if(captureTime==0)return;
+		//long captureTime = captureFrame();
+		//if(captureTime==0)return;
 		
 		// track
-		Mat origin = mCgTrack.trackGrid(camera_res.y, camera_res.x,frameIdForTracker(), captureTime);
+		Mat origin;
+		//origin = mCgTrack.trackGrid(camera_res.y, camera_res.x,frameIdForTracker(), captureTime);
+		{
+			origin = Mat.zeros(0, 0, CvType.CV_32FC1);
 
+
+
+			if(mPositionComm!=null || mPositionRecv!=null) {
+				if (sendBT) {
+					if (count_BTSend != -1) {
+						mPositionComm.sendData(count_BTSend, count_BTSend, count_BTSend, count_BTSend, count_BTSend, count_BTSend);
+						count_BTSend++;
+						try {
+							Thread.sleep(wait_time,0);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				} else {
+					//if(mPositionRecv.data_dirty)
+					{
+						Log.e("cgt", "waiting");
+						while (!mPositionRecv.data_dirty) {
+							int temp_int = 0;
+							try {
+								Thread.sleep(0, 500000);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+						Log.e("cgt", "received");
+						mPositionRecv.data_dirty = false;
+						count_BTSend++;
+					}
+				}
+			}
+			long captureTime = captureFrame();
+			/*
+			if (!mCameraManager.allowExposureUpdate) {
+				// send
+				mPositionComm.sendData(count_BTSend,count_BTSend,count_BTSend,count_BTSend,count_BTSend,count_BTSend);
+			}else{
+				mPositionRecv.data_dirty=false;
+			}
+			*/
+		}
 		// send
 		if(origin.rows()!=0 && sendBT){
 			mPositionComm.sendData((float)origin.get(0,0)[0],(float)origin.get(1,0)[0],(float)origin.get(2,0)[0],(float)origin.get(3,0)[0],(float)origin.get(4,0)[0],(float)origin.get(5,0)[0]);
@@ -137,103 +200,21 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 		
 		// update
 		if(mCameraManager.allowWBUpdate && origin.rows()!=0){
-			getColorPixelDiff();
+			//getColorPixelDiff();
 		}
-		mCameraManager.updateCameraParams(mCgTrack,origin, camera_res);
+		//mCameraManager.updateCameraParams(mCgTrack,origin, camera_res);
 		
 		// debug
 		if(mCgTrack.mDebugLevel==1){
-			mShaderManager.renderFromTexture(mShaderManager.glTextures[1], display_dim);
+			mShaderManager.renderFromTexture(mShaderManager.glTextures_in[(mCameraManager.frameNo-1+nFBOs)%nFBOs], display_dim);
 		}else{
-			mShaderManager.renderFromTexture(mShaderManager.glTextures[0], display_dim);
+			mShaderManager.renderFromTexture(mShaderManager.glTextures_in[(mCameraManager.frameNo-1+nFBOs)%nFBOs], display_dim);
 		}
-	}
-
-	private int getColorPixelDiff(){
-		GLES31.glBindFramebuffer(GLES31.GL_FRAMEBUFFER, mShaderManager.targetFramebuffer.get(0));
-
-		ByteBuffer byteBuffer1 = ByteBuffer.allocate(4);
-		byteBuffer1.order(ByteOrder.nativeOrder());
-
-		int[][] order={{0,1,4,3},{1,2,5,4},{4,5,8,7},{3,4,7,6}};
-
-		double[] x = new double[4];
-		double[] y = new double[4];
-
-		int [][] colors = new int[4][3];
-		int count_valid=0;
-		for(int i=0;i<4;i++) {
-			x[i] = 0;
-			y[i]=0;
-			for(int j=0;j<4;j++) {
-				x[i] += mCgTrack.mCorners.get(order[i][j], 0)[0];
-				y[i] += mCgTrack.mCorners.get(order[i][j], 1)[0];
-			}
-			x[i] /=4;
-			y[i] /=4;
-
-			int xi,yi;
-			xi = (int)Math.round(x[i]);
-			yi = (int)Math.round(y[i]);
-
-			if(xi>=0 && xi<1080 && yi>=0 && yi<1920) {
-				GLES31.glReadPixels(yi, xi, 1, 1, GLES31.GL_RGBA, GLES31.GL_UNSIGNED_BYTE, byteBuffer1);
-				byte[] array = byteBuffer1.array();
-				//Log.e("cgt","DiffVals camPix:"+i+"["+byteToUnsignedInt(array[0])+","+byteToUnsignedInt(array[1])+","+byteToUnsignedInt(array[2])+","+byteToUnsignedInt(array[3])+"]"+xi+","+yi);
-				colors[i][0] =  byteToUnsignedInt(array[0]);
-				colors[i][1] =  byteToUnsignedInt(array[1]);
-				colors[i][2] =  byteToUnsignedInt(array[2]);
-				count_valid++;
-			}
-		}
-
-		int colDiff=0;
-		if(count_valid==4){
-			colDiff += 255-colors[0][0]+colors[0][1]+colors[0][2];
-			colDiff += colors[1][0]+255-colors[1][1]+colors[1][2];
-			colDiff += colors[2][0]+colors[2][1]+255-colors[2][2];
-			colDiff += colors[3][0]+255-colors[3][1]+colors[3][2];
-			mCameraManager.colorPixelDiff = colDiff;
+		if(sendBT) {
+			if (count_BTSend == nFBOs) count_BTSend = -1;
 		}else{
-			mCameraManager.colorPixelDiff = -1;
+			if (count_BTSend == nFBOs) count_BTSend = 0;
 		}
-
-
-		/*
-		{
-			ByteBuffer byteBuffer = ByteBuffer.allocate(1920 * 1080 * 4);
-			byteBuffer.order(ByteOrder.nativeOrder());
-
-			GLES31.glReadPixels(0, 0, 1920, 1080, GLES31.GL_RGBA, GLES31.GL_UNSIGNED_BYTE, byteBuffer);
-			int error14 = GLES31.glGetError();
-			byte[] array = byteBuffer.array();
-
-			java.io.FileOutputStream outputStream = null;
-			try {
-				String diskstate = Environment.getExternalStorageState();
-				if(diskstate.equals("mounted")){
-					java.io.File picFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-					java.io.File picFile = new java.io.File(picFolder,"imgc.bin");
-					outputStream = new java.io.FileOutputStream(picFile);
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				outputStream.write(array);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-*/
-		return 0;
 	}
 
 	public int byteToUnsignedInt(byte b) {
@@ -261,7 +242,6 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 		ColorGridTracker.destroyCL();
 		mShaderManager.deleteTex();
 	}
-
 
 	/**
 	 * Measure frames per second.
@@ -291,8 +271,13 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
 	 */
 	public void initBT(Activity activity){
 		if(sendBT){
+			count_BTSend=-1;
 	        mPositionComm = BtPosition6f.getInstance(activity);
 	        mPositionComm.start();
+		}
+		if(recvBT){
+			count_BTSend=0;
+			mPositionRecv = BTReceiverClass6.newInstance(activity);
 		}
 	}
 	
@@ -303,6 +288,9 @@ public class CustomGLRenderer implements GLSurfaceView.Renderer{
     	if(sendBT){
     		mPositionComm.stop();
     	}
+    	if(recvBT){
+    		mPositionRecv.onDestroy();
+		}
     	ColorGridTracker.destroyCL();
     }
 }

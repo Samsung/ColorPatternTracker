@@ -4,11 +4,16 @@ import com.samsung.dtl.colorpatterntracker.R; // don't remove this import, other
 import com.samsung.dtl.colorpatterntracker.util.HandlerExtension;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +26,9 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -47,6 +55,7 @@ public class MainTrackerActivity extends Activity {
 	SeekBar seekbar_focus;
     
     Handler detectedPatternTextHandler; /*!< The text handler to show learned patterns. */
+	Activity myApp;
         
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -71,6 +80,8 @@ public class MainTrackerActivity extends Activity {
 			}
 		}
 		super.onCreate(savedInstanceState);
+
+		myApp = this;
 		setContentView(R.layout.activity_main);
 		detectedPatternTextHandler = new HandlerExtension(this);
 
@@ -88,14 +99,14 @@ public class MainTrackerActivity extends Activity {
 		mView = (CustomGLSurfaceView) findViewById(R.id.surfaceviewclass);
 		mView.setDisplayDim(displayDim);
 				
-		// bluetooth
-		mView.mRenderer.initBT(this); 
-		
+
 		mView.mRenderer.mCgTrack.mTextDetectedPatterns = (TextView) findViewById(R.id.text_detectedPatterns);
 		mView.mRenderer.mCgTrack.mTextDetectedPatterns.setTextColor(Color.rgb(0, 0, 0));
 		mView.mRenderer.mCgTrack.textViewHandler = (HandlerExtension) detectedPatternTextHandler;
 		mView.mRenderer.mShaderManager.context = getApplicationContext();
-		
+
+
+
 		// debug
 		setDebugButton();
 	    
@@ -109,6 +120,33 @@ public class MainTrackerActivity extends Activity {
 		setModifyExposureButton();
 
 		setModifyFocusButton();
+
+		// bluetooth
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						//Yes button clicked
+						mView.mRenderer.sendBT = true;
+						mView.mRenderer.recvBT = false;
+						mView.mRenderer.initBT(myApp);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						mView.mRenderer.sendBT = false;
+						mView.mRenderer.recvBT = true;
+						mView.mRenderer.initBT(myApp);
+						break;
+				}
+			}
+		};
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Bluetooth mode?").setPositiveButton("Sender", dialogClickListener)
+				.setNegativeButton("Receiver", dialogClickListener).show();
+
+
 	}
 	
 	/**
@@ -136,13 +174,8 @@ public class MainTrackerActivity extends Activity {
 	    button_updateGeom = (Button) findViewById(R.id.button_updateGeom);
 	    button_updateGeom.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	if(mView.mRenderer.mCgTrack.mUpdateRelTransf){           		
-            		mView.mRenderer.mCgTrack.mUpdateRelTransf=false;
-            		button_updateGeom.setText("Update Geom: Off");
-            	}else{
-            		mView.mRenderer.mCgTrack.mUpdateRelTransf=true;
-            		button_updateGeom.setText("Update Geom: On");
-            	}
+            	mView.mRenderer.count_BTSend=0;
+				button_updateGeom.setText("cap start");
             }
         });		
 	}
@@ -193,16 +226,11 @@ public class MainTrackerActivity extends Activity {
 			}
 
 			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				Log.e("cam","progress changed to "+progress);
 				// TODO Auto-generated method stub
-				if(mView.mRenderer.mCameraManager.allowExposureUpdate){
-					mView.mRenderer.mCameraManager.mExposureSeekbarProgress = progress;
-				}else{
-					if(seekbar_exposure.getProgress() != mView.mRenderer.mCameraManager.mExposureSeekbarProgress ){
-						seekbar_exposure.setProgress(mView.mRenderer.mCameraManager.mExposureSeekbarProgress );
-					}
-				}
+				button_exposure.setText("Wait: " + progress);
+				mView.mRenderer.wait_time = progress;
 			}
 		});
 	}

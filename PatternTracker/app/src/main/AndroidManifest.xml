@@ -4,6 +4,8 @@
     android:installLocation="preferExternal"
     android:versionCode="1"
     android:versionName="1.0">
+    <uses-feature android:name="android.hardware.usb.host"  android:required="true"/>
+    <uses-permission android:name="android.hardware.usb.host"/>
     <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="17"/>
 
     <!-- Tell the system this app requires OpenGL ES 2.0. -->

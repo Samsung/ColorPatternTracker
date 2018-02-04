@@ -2,31 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c9eb68e9-3725-42af-a3c8-4d51142e52a2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Tracker_openmp/Tracker_openmp.VC.db" afterPath="$PROJECT_DIR$/Tracker_openmp/Tracker_openmp.VC.db" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/.idea/workspace.xml" afterPath="$PROJECT_DIR$/PatternTracker/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/BluetoothLibrary/BluetoothLibrary.iml" afterPath="$PROJECT_DIR$/PatternTracker/BluetoothLibrary/BluetoothLibrary.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/BluetoothLibrary/build.gradle" afterPath="$PROJECT_DIR$/PatternTracker/BluetoothLibrary/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/PatternTracker.iml" afterPath="$PROJECT_DIR$/PatternTracker/PatternTracker.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/BluetoothLibrary/src/main/java/com/samsung/dtl/bluetoothlibrary/profile/BTReceiverClass6.java" afterPath="$PROJECT_DIR$/PatternTracker/BluetoothLibrary/src/main/java/com/samsung/dtl/bluetoothlibrary/profile/BTReceiverClass6.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/app.iml" afterPath="$PROJECT_DIR$/PatternTracker/app/app.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/build.gradle" afterPath="$PROJECT_DIR$/PatternTracker/app/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/AndroidManifest.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/Android.mk" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/Android.mk" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/cgt.cpp" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/cgt.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/cgt.h" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/cgt.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/CLTracker.cpp" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/CLTracker.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/opencl/stringify_kernels.sh" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/opencl/stringify_kernels.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/util.cpp" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/util.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/util.h" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/cpp/src/util.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/ColorGridTracker.java" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/ColorGridTracker.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/CustomGLRenderer.java" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/CustomGLRenderer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/CustomGLSurfaceView.java" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/CustomGLSurfaceView.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/MainTrackerActivity.java" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/MainTrackerActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/camera/ShaderManager.java" afterPath="$PROJECT_DIR$/PatternTracker/app/src/main/java/com/samsung/dtl/colorpatterntracker/camera/ShaderManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/libraries/libraries.iml" afterPath="$PROJECT_DIR$/PatternTracker/libraries/libraries.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/libraries/opencv/build.gradle" afterPath="$PROJECT_DIR$/PatternTracker/libraries/opencv/build.gradle" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PatternTracker/libraries/opencv/opencv.iml" afterPath="$PROJECT_DIR$/PatternTracker/libraries/opencv/opencv.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Tracker_openmp/Tracker_openmp.cpp" afterPath="$PROJECT_DIR$/Tracker_openmp/Tracker_openmp.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Tracker_openmp/Tracker_openmp.vcxproj" afterPath="$PROJECT_DIR$/Tracker_openmp/Tracker_openmp.vcxproj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Sketchfab/.idea/workspace.xml" afterPath="$PROJECT_DIR$/Sketchfab/.idea/workspace.xml" />
     </list>
     <ignored path="ColorPatternTracker.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -55,18 +38,8 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
-    <option name="width" value="1936" />
+    <option name="width" value="1932" />
     <option name="height" value="1176" />
-  </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
-    <OptionsSetting value="true" id="Add" />
-    <OptionsSetting value="true" id="Remove" />
-    <OptionsSetting value="true" id="Checkout" />
-    <OptionsSetting value="true" id="Update" />
-    <OptionsSetting value="true" id="Status" />
-    <OptionsSetting value="true" id="Edit" />
-    <ConfirmationsSetting value="0" id="Add" />
-    <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -83,14 +56,21 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane">
+      <pane id="Scratches" />
+      <pane id="AndroidView">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
               <option name="myItemId" value="ColorPatternTracker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+        </subPane>
+      </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
           <PATH>
             <PATH_ELEMENT>
               <option name="myItemId" value="ColorPatternTracker" />
@@ -117,26 +97,25 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scratches" />
-      <pane id="AndroidView">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ColorPatternTracker" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="settings.editor.selected.configurable" value="android.sdk-updates" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/PatternTracker" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager">
     <configuration default="true" type="Application" factoryName="Application">
@@ -223,23 +202,25 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="false" />
+    <frame x="-8" y="-8" width="1932" height="1176" extended-state="0" />
     <layout>
+      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19616205" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19604701" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -247,9 +228,11 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
